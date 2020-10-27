@@ -1,7 +1,7 @@
-# demo-apps
+# example-apps
 
 #### 介绍
-Demo applications based on EdgeGallery
+Example applications based on EdgeGallery
 
 #### 软件架构
 软件架构说明
