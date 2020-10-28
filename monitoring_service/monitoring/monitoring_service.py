@@ -24,6 +24,8 @@ sslify = SSLify(app)
 @app.route('/', methods=['GET'])
 def hello_world():
     return Response("Hello MEC Developer")
+
+
 @app.route('/v1/monitor/persons/<person_name>', methods=['DELETE'])
 def delete_person(person_name):
     """
@@ -44,6 +46,8 @@ def delete_person(person_name):
         return jsonify({'Result': 'delete success'})
     else:
         return jsonify({"Result": "the name is not exist"})
+
+
 @app.route('/v1/monitor/messages')
 def monitor_messages():
     app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
