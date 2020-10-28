@@ -25,6 +25,16 @@ sslify = SSLify(app)
 def hello_world():
     return Response("Hello MEC Developer")
 
+@app.route('/v1/monitor/persons/<person_name>/messages')
+def query_person(person_name):
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    for msg in listOfMsgs:
+        if msg["relatedObj"] == person_name:
+            return jsonify(msg)
+    return Response("person name " + person_name + " doesn't exist")
+
+
 def start_server(handler):
     app.logger.addHandler(handler)
     if config.ssl_enabled:

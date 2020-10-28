@@ -29,3 +29,7 @@ ssl_certfilepath = "/usr/app/ssl/server_tls.crt"
 ssl_keyfilepath = "/usr/app/ssl/server_tls.key"
 ssl_cacertpath = "/usr/app/ssl/ca.crt"
 ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
+
+# [Constants]
+zip_filename = 'monitorPersons.zip'
+recognition_url = "http://127.0.0.1:9999"
