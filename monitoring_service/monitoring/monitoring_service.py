@@ -24,6 +24,32 @@ sslify = SSLify(app)
 @app.route('/', methods=['GET'])
 def hello_world():
     return Response("Hello MEC Developer")
+@app.route('/v1/monitor/persons/<person_name>', methods=['DELETE'])
+def delete_person(person_name):
+    """
+    param: person_name
+    """
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    person = person_name
+    person_name = person_name[0:-4]
+    url = config.recognition_url + "/v1/face-recognition/{0}".format(person_name)
+
+    result = requests.delete(url, data=person_name, verify=config.ssl_cacertpath)
+    if result:
+        os.remove(app.config['UPLOAD_PATH'] + person)
+        for msg in listOfMsgs:
+            if person_name in msg["relatedObj"]:
+                listOfMsgs.remove(msg)
+        return jsonify({'Result': 'delete success'})
+    else:
+        return jsonify({"Result": "the name is not exist"})
+@app.route('/v1/monitor/messages')
+def monitor_messages():
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    return jsonify(listOfMsgs)
+
 
 @app.route('/v1/monitor/persons/<person_name>/messages')
 def query_person(person_name):
