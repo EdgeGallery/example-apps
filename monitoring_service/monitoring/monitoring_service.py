@@ -23,6 +23,8 @@ sslify = SSLify(app)
 
 @app.route('/', methods=['GET'])
 def hello_world():
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
     return Response("Hello MEC Developer")
 
 
