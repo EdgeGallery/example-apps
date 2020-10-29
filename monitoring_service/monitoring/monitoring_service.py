@@ -21,6 +21,13 @@ from flask_sslify import SSLify
 app = Flask(__name__)
 sslify = SSLify(app)
 
+@app.route('/v1/monitor/cameras')
+def query_cameras():
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    return jsonify(listOfCameras)
+
+
 @app.route('/', methods=['GET'])
 def hello_world():
     app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
