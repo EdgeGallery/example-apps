@@ -30,8 +30,10 @@ ssl_keyfilepath = "/usr/app/ssl/server_tls.key"
 ssl_cacertpath = "/usr/app/ssl/ca.crt"
 ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
 
-# [Constants]
-zip_filename = '/tmp/monitorPersons.zip'
+# [Service Configurations]
 api_gateway = os.environ.get("API_GATEWAY", "apigw.mep.org")
 face_recognition = os.environ.get("FACE_RECOGNITION", "facerecognition")
+
+# [Constants]
+zip_filename = '/tmp/monitorPersons.zip'
 recognition_url = "http://" + api_gateway + "/" + face_recognition
