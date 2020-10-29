@@ -21,6 +21,24 @@ from flask_sslify import SSLify
 app = Flask(__name__)
 sslify = SSLify(app)
 
+
+@app.route('/v1/monitor/cameras/<camera_name>', methods=['DELETE'])
+def delete_camera(camera_name):
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    for video1 in listOfVideos:
+        if camera_name in video1:
+            video_obj = video1[camera_name]
+            video_obj.delete()
+    for camera in listOfCameras:
+        if camera_name == camera["name"]:
+            listOfCameras.remove(camera)
+    for msg in listOfMsgs:
+        if camera_name in msg["msg"]:
+            listOfMsgs.remove(msg)
+    return Response("success")
+
+
 @app.route('/v1/monitor/cameras')
 def query_cameras():
     app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
