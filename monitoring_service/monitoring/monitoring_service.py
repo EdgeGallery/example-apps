@@ -26,6 +26,18 @@ def hello_world():
     return Response("Hello MEC Developer")
 
 
+@app.route('/v1/monitor/<person_name>')
+def monitor_person(person_name):
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    if path.exists(app.config['UPLOAD_PATH'] + person_name):
+        return send_from_directory(app.config['UPLOAD_PATH'], person_name)
+    else:
+        return Response("Image " + person_name + " doesn't exist")
+
+
+
+
 @app.route('/v1/monitor/persons/<person_name>', methods=['DELETE'])
 def delete_person(person_name):
     """
