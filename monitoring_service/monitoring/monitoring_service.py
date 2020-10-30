@@ -63,6 +63,7 @@ class VideoFile(object):
 
 
 app = Flask(__name__)
+CORS(app)
 sslify = SSLify(app)
 app.config['JSON_AS_ASCII'] = False
 app.config['UPLOAD_PATH'] = '/usr/app/images/'
