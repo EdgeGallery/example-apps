@@ -22,6 +22,16 @@ app = Flask(__name__)
 sslify = SSLify(app)
 
 
+@app.route('/v1/monitor/cameras', methods=['POST'])
+def add_camera():
+    camera_info = request.json
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    camera_info = {"name": camera_info["name"], "rtspurl": camera_info["rtspurl"], "location": camera_info["location"]}
+    listOfCameras.append(camera_info)
+    return Response("success")
+
+
 @app.route('/v1/monitor/cameras/<camera_name>', methods=['DELETE'])
 def delete_camera(camera_name):
     app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
