@@ -53,6 +53,29 @@ def hello_world():
     return Response("Hello MEC Developer")
 
 
+@app.route('/v1/monitor/persons', methods=['POST'])
+def upload():
+    """
+    图像录入
+    """
+    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+                    " Resource [" + request.url + "]")
+    if 'file' not in request.files:
+        raise IOError('No file')
+    url = config.recognition_url + "/v1/face-recognition/upload"
+
+    files = request.files.getlist("file")
+    for file in files:
+        file.save(os.path.join(app.config['UPLOAD_PATH'], file.filename))
+
+    upload_files = []
+    for file in files:
+        upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
+
+    result = requests.post(url, files=upload_files, verify=config.ssl_cacertpath)
+    return result.text
+
+
 @app.route('/v1/monitor/<person_name>')
 def monitor_person(person_name):
     app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
