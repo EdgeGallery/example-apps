@@ -272,6 +272,7 @@ def query_person(person_name):
 
 
 def start_server(handler):
+    logging.basicConfig(level=logging.INFO)
     app.logger.addHandler(handler)
     if config.ssl_enabled:
         context = (config.ssl_certfilepath, config.ssl_keyfilepath)
