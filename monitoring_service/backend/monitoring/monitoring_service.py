@@ -177,6 +177,9 @@ def add_camera():
     camera_info = request.json
     app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
                     " Resource [" + request.url + "]")
+    if len(camera_info["name"]) >= 64 or len(camera_info["location"]) >= 64:
+        raise ValidationError("length of the camera name or location is larger than max size")
+
     camera_info = {"name": camera_info["name"], "rtspurl": camera_info["rtspurl"], "location": camera_info["location"]}
     listOfCameras.append(camera_info)
     return Response("success")
