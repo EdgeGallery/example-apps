@@ -19,3 +19,4 @@ requests
 flask_sslify
 opencv-python
 flask_cors
+marshmallow
