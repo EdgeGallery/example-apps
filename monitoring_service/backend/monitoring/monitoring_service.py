@@ -19,7 +19,7 @@ import requests
 import os
 import time
 from os import path
-from flask import Flask, Response, request, jsonify, send_from_directory, send_file
+from flask import Flask, Response, request, jsonify, send_from_directory
 import config
 import json
 import logging
@@ -98,6 +98,28 @@ def allowed_videofile(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_VIDEO_EXTENSIONS
 
 
+def send_notification_msg(camera_name, name):
+    global count
+
+    camera = camera_name.split("-")
+    if name != "unknown":
+        if len(listOfMsgs) == 0:
+            count = count + 1
+            newdict = {"msgid": count, "time": time.strftime("%Y%m%d-%H:%M:%S:" + "321"), "relatedObj": name,
+                       "msg": name + " has arrived in front of camera " + camera[0]}
+            listOfMsgs.append(newdict)
+        flag = False
+        for msg in listOfMsgs:
+            if name in msg.values():
+                flag = True
+                break
+        if not flag:
+            count = count + 1
+            newdict = {"msgid": count, "time": time.strftime("%Y%m%d-%H:%M:%S:" + "321"), "relatedObj": name,
+                       "msg": name + " has arrived in front of camera " + camera[0]}
+            listOfMsgs.append(newdict)
+
+
 def video(video_capture, camera_name):
     """
     人脸识别
@@ -117,10 +139,10 @@ def video(video_capture, camera_name):
             data = json.loads(requests.post(url, data=info1, verify=config.ssl_cacertpath).text)
 
         for info in data:
-            top = info['Face position']['top']
-            right = info['Face position']['right']
-            bottom = info['Face position']['bottom']
-            left = info['Face position']['left']
+            top = info[config.face_position]['top']
+            right = info[config.face_position]['right']
+            bottom = info[config.face_position]['bottom']
+            left = info[config.face_position]['left']
             name = info['Name']
             # Scale back up face locations since the frame we detected in was scaled to 1/4 size
             top *= 2
@@ -133,23 +155,8 @@ def video(video_capture, camera_name):
             cv2.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.8, (255, 255, 255), 1)
-            camera = camera_name.split("-")
-            if name != "unknown":
-                if len(listOfMsgs) == 0:
-                    count = count + 1
-                    newdict = {"msgid": count, "time": time.strftime("%Y%m%d-%H:%M:%S:" + "321"), "relatedObj": name,
-                           "msg": name + " has arrived in front of camera " + camera[0]}
-                    listOfMsgs.append(newdict)
-                flag = False
-                for msg in listOfMsgs:
-                    if name in msg.values():
-                        flag = True
-                        break
-                if not flag:
-                    count = count + 1
-                    newdict = {"msgid": count, "time": time.strftime("%Y%m%d-%H:%M:%S:" + "321"), "relatedObj": name,
-                           "msg": name + " has arrived in front of camera " + camera[0]}
-                    listOfMsgs.append(newdict)
+            send_notification_msg(camera_name, name)
+
         ret, jpeg = cv2.imencode('.jpg', frame)
         process_this_frame = process_this_frame + 1
         if process_this_frame == 2:
@@ -160,8 +167,8 @@ def video(video_capture, camera_name):
 
 @app.route('/v1/monitor/video', methods=['POST'])
 def upload_video():
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if 'file' in request.files:
         files = request.files.getlist("file")
         for file in files:
@@ -175,8 +182,8 @@ def upload_video():
 @app.route('/v1/monitor/cameras', methods=['POST'])
 def add_camera():
     camera_info = request.json
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if len(camera_info["name"]) >= 64 or len(camera_info["location"]) >= 64:
         raise ValidationError("length of the camera name or location is larger than max size")
 
@@ -190,10 +197,10 @@ def get_camera(name, rtspurl, location):
     """
     通过摄像头人脸识别
     """
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if len(name) >= 64 or len(location) >= 64:
-        raise ValidationError("length of the person name is larger than max size")
+        raise ValidationError(config.person_maxsize)
 
     camera_info = {"name": name, "rtspurl": rtspurl, "location": location}
     if "mp4" in camera_info["rtspurl"]:
@@ -212,8 +219,8 @@ def get_camera(name, rtspurl, location):
 
 @app.route('/v1/monitor/cameras/<camera_name>', methods=['DELETE'])
 def delete_camera(camera_name):
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if len(camera_name) >= 64:
         raise ValidationError("length of the camera name is larger than max size")
 
@@ -233,14 +240,14 @@ def delete_camera(camera_name):
 
 @app.route('/v1/monitor/cameras')
 def query_cameras():
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     return jsonify(listOfCameras)
 
 
 @app.route('/', methods=['GET'])
 def hello_world():
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
                     " Resource [" + request.url + "]")
     return Response("Hello MEC Developer")
 
@@ -250,8 +257,8 @@ def upload():
     """
     图像录入
     """
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if 'file' not in request.files:
         raise IOError('No file')
     url = config.recognition_url + "/v1/face-recognition/upload"
@@ -273,10 +280,10 @@ def upload():
 
 @app.route('/v1/monitor/<person_name>')
 def monitor_person(person_name):
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if len(person_name) >= 64:
-        raise ValidationError("length of the person name is larger than max size")
+        raise ValidationError(config.person_maxsize)
 
     if path.exists(app.config['UPLOAD_PATH'] + person_name):
         return send_from_directory(app.config['UPLOAD_PATH'], person_name)
@@ -291,10 +298,10 @@ def delete_person(person_name):
     """
     param: person_name
     """
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if len(person_name) >= 64:
-        raise ValidationError("length of the person name is larger than max size")
+        raise ValidationError(config.person_maxsize)
 
     person = person_name
     person_name = person_name[0:-4]
@@ -313,17 +320,17 @@ def delete_person(person_name):
 
 @app.route('/v1/monitor/messages')
 def monitor_messages():
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     return jsonify(listOfMsgs)
 
 
 @app.route('/v1/monitor/persons/<person_name>/messages')
 def query_person(person_name):
-    app.logger.info("Received message from ClientIP [" + request.remote_addr + "] Operation [" + request.method + "]" +
-                    " Resource [" + request.url + "]")
+    app.logger.info(config.received_message + request.remote_addr + config.operation + request.method + "]" +
+                    config.resource + request.url + "]")
     if len(person_name) >= 64:
-        raise ValidationError("length of the person name is larger than max size")
+        raise ValidationError(config.person_maxsize)
 
     for msg in listOfMsgs:
         if msg["relatedObj"] == person_name:
