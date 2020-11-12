@@ -1,0 +1,149 @@
+/*
+ *  Copyright 2020 Huawei Technologies Co., Ltd.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+html,body,p,h1,h2,h3,h4,h5,h6,ul,li{
+  margin:0;
+  padding:0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+#app,html,body{
+  height:100%;
+}
+.el-main{
+  padding:20px 20px 60px 20px;
+}
+a{
+  text-decoration: none;
+  color:#fff;
+}
+li{
+  list-style: none;
+}
+.lt{
+  float: left;
+}
+.rt{
+  float: right;
+}
+.clearfix{
+  clear: both;
+}
+.breadcrumb{
+  line-height: 50px;
+  padding: 25px 5%;
+  margin-top: 60px;
+}
+.pageBar{
+  padding:25px 0;
+}
+.error{
+  color:#F56C6C;
+}
+.success{
+  color:#67C23A;
+}
+.wait{
+  color:#E6A23C;
+}
+.primary{
+  color:#409EFF;
+}
+.mt20{
+  margin-top:20px;
+}
+.flex{
+  display: flex
+}
+.h100{
+  height: 100%;
+}
+.cp, .curp{
+  cursor: pointer;
+}
+
+
+/* 自适应
+@media screen and (min-width: 1201px) { 
+  .home-container {max-width: 1200px} 
+} 
+@media screen and (max-width: 1200px) { 
+  .home-container {max-width: 900px} 
+} 
+@media screen and (max-width: 901px) { 
+  .home-container {max-width: 800px;} 
+}
+.home-container{
+  margin:0 auto;
+} */
+
+@media screen and (min-width: 1201px) { 
+  .monitor {max-width: 1200px} 
+} 
+@media screen and (max-width: 1200px) { 
+  .monitor {max-width: 900px} 
+} 
+@media screen and (max-width: 901px) { 
+  .monitor {max-width: 800px;} 
+}
+
+/* dialog */
+.el-dialog__body{
+  padding-top:15px!important;
+}
+.el-dialog__header{
+  background: #409EFF;
+}
+.el-dialog__headerbtn:focus .el-dialog__close, .el-dialog__headerbtn:hover .el-dialog__close,.el-dialog__title,.el-icon-close,.el-dialog__headerbtn .el-dialog__close{
+  color:#fff;
+}
+
+/* navBar */
+.el-menu--horizontal>.el-submenu .el-submenu__icon-arrow{
+  margin-top:3px;
+}
+.el-submenu__icon-arrow{
+  margin-top:-3px;
+}
+
+
+.el-message{
+  top: 65px !important;
+}
+
+body .el-table th.gutter{
+  display: table-cell !important;
+}
+
+
+/* 表格统一样式 */
+.el-table .has-gutter th{
+  background: #F0F3FA;
+  height:32px;
+}
+
+/* area-link样式 */
+.area-select>.area-selected-trigger{
+  padding-top:0px !important;
+}
+
+
+/* .el-upload{
+  width:100% !important;
+} */
+
+.el-upload-dragger{
+  width:100% !important;
+}
