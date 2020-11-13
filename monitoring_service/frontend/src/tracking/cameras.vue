@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2020 Huawei Technologies Co., Ltd.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 <template>
   <div class="camera-display">
     <div class="padding-1">
@@ -11,7 +26,44 @@
       >
         Add Camera
       </el-button>
+      <el-button
+        type="primary"
+        @click="dialogvideoFrom = true"
+        class="add-cam mar-rgt-1p"
+      >
+        Add Video
+      </el-button>
     </div>
+    <!--add video-->
+    <el-dialog
+      title="Add video"
+      :visible.sync="dialogvideoFrom"
+    >
+      <div class="upload-video-con">
+        <span class="upload-video ">UploadVideo:</span>
+        <input
+          type="file"
+          ref="videoFile"
+          accept="mp4"
+          @change="referenceUpload($event)"
+          v-if="uploadReady"
+          autocomplete="off"
+          aria-label="File browser example"
+          class="video-input "
+        >
+      </div>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="dialogvideoFrom = false">Cancel</el-button>
+        <el-button
+          type="primary"
+          @click="uploadVideoFile() ; dialogvideoFrom = false"
+        >Add</el-button>
+      </span>
+    </el-dialog>
+
     <el-dialog
       title="Add Camera"
       :visible.sync="dialogFormVisible"
@@ -60,28 +112,6 @@
             autocomplete="off"
           />
         </el-form-item>
-        <el-form-item style="margin-left: 53px;">
-          <el-checkbox v-model="checked">
-            Click here to UploadVideo
-          </el-checkbox>
-        </el-form-item>
-        <el-form-item
-          v-if="checked"
-          label="UploadVideo"
-          :label-width="formLabelWidth"
-        >
-          <div>
-            <input
-              type="file"
-              ref="videoFile"
-              accept="mp4"
-              @change="referenceUpload($event)"
-              v-if="uploadReady"
-              autocomplete="off"
-              aria-label="File browser example"
-            >
-          </div>
-        </el-form-item>
       </el-form>
       <span
         slot="footer"
@@ -90,7 +120,7 @@
         <el-button @click="hideAddCamera">Cancel</el-button>
         <el-button
           type="primary"
-          @click="addCamera('formData') ; uploadPersonsVideo()"
+          @click="addCamera('formData')"
         >Add</el-button>
       </span>
     </el-dialog>
@@ -120,6 +150,7 @@ export default {
   data () {
     return {
       dialogFormVisible: false,
+      dialogvideoFrom: false,
       formData: {
         name: '',
         location: '',
@@ -205,32 +236,35 @@ export default {
       }
     },
     // Upload video
-    uploadPersonsVideo () {
-      if (this.checked === true) {
-        const URL = baseUrl.baseUrl + 'video'
-        let data = new FormData()
-        data.append('file', this.videoFile)
-        let config = {
-          header: {
-            'Content-Type': 'multipart/form-data'
-          }
+    uploadVideoFile () {
+      const URL = baseUrl.baseUrl + 'video'
+      let data = new FormData()
+      data.append('file', this.videoFile)
+      let config = {
+        header: {
+          'Content-Type': 'multipart/form-data'
         }
-        axios.post(URL, data, config).then(
-          response => {
-            this.hideAddCamera()
-            this.clearUpload()
-          }
-        )
-          .catch(error => {
-            this.errorMessage = error.message
-            this.$notify.error({
-              title: 'Error',
-              message: 'Error in Upload Video'
-            })
-            this.hideAddCamera()
-            this.clearUpload()
-          })
       }
+      axios.post(URL, data, config).then(
+        response => {
+          this.hideAddCamera()
+          this.clearUpload()
+          this.$notify({
+            title: 'Success',
+            message: 'Video uploaded successfully',
+            type: 'success'
+          })
+        }
+      )
+        .catch(error => {
+          this.errorMessage = error.message
+          this.$notify.error({
+            title: 'Error',
+            message: 'Error in Upload Video'
+          })
+          this.hideAddCamera()
+          this.clearUpload()
+        })
     },
     // clear Upload
     clearUpload () {
@@ -254,10 +288,6 @@ export default {
         })
         .catch(error => {
           this.errorMessage = error.message
-          this.$notify.error({
-            title: 'Error',
-            message: 'Error in Getting Camera Details'
-          })
         })
     },
     // Delete Camera
@@ -310,4 +340,21 @@ export default {
   font-size: 20px;
   font-weight: bold
 }
+.mar-rgt-1p{
+  margin-right: 1%;
+}
+.upload-video {
+    font-size: 16px;
+    font-weight: bold;
+}
+.upload-video-con {
+    text-align: center;
+    position: relative;
+    top: 15px;
+}
+.video-input {
+  padding: 1%;
+  border: 1px solid #9e9e9e33;
+}
+
 </style>

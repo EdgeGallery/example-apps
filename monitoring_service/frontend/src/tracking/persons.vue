@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2020 Huawei Technologies Co., Ltd.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 <template>
   <div class="top-container">
     <div class="width-47">
@@ -45,7 +60,7 @@
           </ul>
           <el-upload
             class="el-upload-list el-upload-list--picture-card"
-            action="https://localhost:3000/v1/monitor/persons"
+            action="http://localhost:3000/v1/monitor/persons"
             list-type="picture-card"
             :on-success="getPersons"
             :show-file-list="false"
@@ -84,7 +99,7 @@
         <el-tab-pane>
           <span slot="label"><i class="el-icon-camera" /> Cameras</span>
           <updatedCameraList
-            :data="cameraList"
+            :data="upDatedCameralist"
           />
         </el-tab-pane>
         <el-tab-pane>
@@ -130,6 +145,7 @@ export default {
       querySinglePerson: [],
       getPersonDetails: {},
       cameraList: [],
+      upDatedCameralist: [],
       uploadReady: true,
       formOptions: {
         inline: true,
@@ -156,6 +172,13 @@ export default {
   beforeMount () {
     this.$root.$on('updateCamera', (data) => {
       this.cameraList = data
+      this.upDatedCameralist = this.cameraList.map(item => {
+        const container = {}
+        container.name = item.name.split('-')[0]
+        container.location = item.location
+        container.rtspurl = item.rtspurl
+        return container
+      })
     })
   },
   created () {
@@ -181,6 +204,7 @@ export default {
         URL,
         dd
       ).then(response => {
+        this.getMessages()
       }).catch(error => {
         this.errorMessage = error.message
       })
@@ -193,10 +217,6 @@ export default {
         })
         .catch(error => {
           this.errorMessage = error.message
-          this.$notify.error({
-            title: 'Error',
-            message: 'Error In Getting Persons'
-          })
         })
     },
     // Clear upload
@@ -233,6 +253,7 @@ export default {
         .then(response => {
           if (response.status === 200) {
             this.getPersons()
+            this.getMessages()
           }
         })
         .catch(error => {
