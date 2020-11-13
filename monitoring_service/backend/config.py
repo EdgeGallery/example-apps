@@ -34,11 +34,3 @@ ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
 api_gateway = os.environ.get("API_GATEWAY", "apigw.mep.org")
 face_recognition = os.environ.get("FACE_RECOGNITION", "facerecognition")
 
-# [Constants]
-zip_filename = '/tmp/monitorPersons.zip'
-recognition_url = "http://" + api_gateway + "/" + face_recognition
-face_position = 'Face position'
-received_message = "Received message from ClientIP ["
-operation = "] Operation ["
-resource = " Resource ["
-person_maxsize = "length of the person name is larger than max size"
