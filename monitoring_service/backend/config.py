@@ -21,7 +21,7 @@ server_port = 9997
 server_address = os.environ.get('LISTEN_IP')
 
 # [SSL Configurations]
-ssl_enabled = True
+ssl_enabled = False
 ssl_protocol = "TLSv1.2"
 ssl_ciphers = ["TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
           "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"]
@@ -33,4 +33,4 @@ ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
 # [Service Configurations]
 api_gateway = os.environ.get("API_GATEWAY", "apigw.mep.org")
 face_recognition = os.environ.get("FACE_RECOGNITION", "facerecognition")
-
+fe_service = os.environ.get("FE_SERVICE", "front-end")

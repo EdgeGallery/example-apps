@@ -22,48 +22,13 @@ from os import path
 from flask import Flask, Response, request, jsonify, send_from_directory
 import config
 import constants
+import datetime
+import threading
 import json
 import logging
 from flask_sslify import SSLify
 from flask_cors import CORS
 from marshmallow import ValidationError
-
-
-class VideoCamera(object):
-    """
-    通过opencv获取实时视频流
-    """
-    def __init__(self, url):
-        self.video = cv2.VideoCapture(url)
-
-    def delete(self):
-        self.video.release()
-
-    def get_frame(self):
-        """
-        获取实时视频流
-        """
-        success, image = self.video.read()
-        return success, image
-
-
-class VideoFile(object):
-    """
-    通过opencv获取实时视频流
-    """
-    def __init__(self, video_name):
-        self.video = cv2.VideoCapture("./test/resources/" + video_name)
-
-    def delete(self):
-        self.video.release()
-
-    def get_frame(self):
-        """
-        获取实时视频流
-        """
-        success, image = self.video.read()
-        return success, image
-
 
 app = Flask(__name__)
 CORS(app)
@@ -79,6 +44,60 @@ listOfCameras = []
 listOfVideos = []
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
+
+
+class VideoCamera(object):
+    """
+    通过opencv获取实时视频流
+    """
+    def __init__(self, url):
+        self.video = cv2.VideoCapture(url)
+        self._person_timeout_check()
+
+    def delete(self):
+        self.video.release()
+
+    def get_frame(self):
+        """
+        获取实时视频流
+        """
+        success, image = self.video.read()
+        return success, image
+
+    def _person_timeout_check(self):
+        threading.Timer(constants.WAIT_SECONDS, self._person_timeout_check).start()
+        # logger.debug("Timeout processing")
+        now = time.time()
+        for msg in listOfMsgs:
+            if now - msg["time"] > constants.PERSON_TIMEOUT_SECONDS:
+                listOfMsgs.remove(msg)
+
+
+class VideoFile(object):
+    """
+    通过opencv获取实时视频流
+    """
+    def __init__(self, video_name):
+        self.video = cv2.VideoCapture(0)
+        self._person_timeout_check()
+
+    def delete(self):
+        self.video.release()
+
+    def get_frame(self):
+        """
+        获取实时视频流
+        """
+        success, image = self.video.read()
+        return success, image
+
+    def _person_timeout_check(self):
+        threading.Timer(constants.WAIT_SECONDS, self._person_timeout_check).start()
+        # logger.debug("Timeout processing")
+        now = time.time()
+        for msg in listOfMsgs:
+            if now - msg["time"] > constants.PERSON_TIMEOUT_SECONDS:
+                listOfMsgs.remove(msg)
 
 
 def allowed_file(filename):
@@ -102,13 +121,18 @@ def allowed_videofile(filename):
 def send_notification_msg(camera_name, name):
     global count
 
+    url = constants.frontend_url + "/notify"
     camera = camera_name.split("-")
     if name != "unknown":
         if len(listOfMsgs) == 0:
             count = count + 1
-            newdict = {"msgid": count, "time": time.strftime("%Y%m%d-%H:%M:%S:" + "321"), "relatedObj": name,
+            newdict = {"msgid": count, "time": time.time(), "relatedObj": name,
                        "msg": name + " has arrived in front of camera " + camera[0]}
+
             listOfMsgs.append(newdict)
+            person_info = newdict.copy()
+            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+            requests.post(url, json=person_info)
         flag = False
         for msg in listOfMsgs:
             if name in msg.values():
@@ -116,9 +140,12 @@ def send_notification_msg(camera_name, name):
                 break
         if not flag:
             count = count + 1
-            newdict = {"msgid": count, "time": time.strftime("%Y%m%d-%H:%M:%S:" + "321"), "relatedObj": name,
+            newdict = {"msgid": count, "time": time.time(), "relatedObj": name,
                        "msg": name + " has arrived in front of camera " + camera[0]}
             listOfMsgs.append(newdict)
+            person_info = newdict.copy()
+            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+            requests.post(url, json=person_info)
 
 
 def video(video_capture, camera_name):
