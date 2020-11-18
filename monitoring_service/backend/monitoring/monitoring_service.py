@@ -131,7 +131,7 @@ def send_notification_msg(camera_name, name):
 
             listOfMsgs.append(newdict)
             person_info = newdict.copy()
-            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S")
             requests.post(url, json=person_info)
         flag = False
         for msg in listOfMsgs:
@@ -144,7 +144,7 @@ def send_notification_msg(camera_name, name):
                        "msg": name + " has arrived in front of camera " + camera[0]}
             listOfMsgs.append(newdict)
             person_info = newdict.copy()
-            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S")
             requests.post(url, json=person_info)
 
 
@@ -373,7 +373,7 @@ def monitor_messages():
     list_of_msgs = []
     for msg in listOfMsgs:
         person_info = msg.copy()
-        person_info["time"] = datetime.datetime.fromtimestamp(person_info["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+        person_info["time"] = datetime.datetime.fromtimestamp(person_info["time"]).strftime("%Y%m%d-%H:%M:%S")
         list_of_msgs.append(person_info)
     return jsonify(list_of_msgs)
 
