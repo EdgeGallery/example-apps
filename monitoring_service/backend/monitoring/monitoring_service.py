@@ -158,12 +158,18 @@ def video(video_capture, camera_name):
         if not success:
             break
         small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        data = ""
         # Convert the image from BGR color  to RGB color
         rgb_small_frame = small_frame[:, :, ::-1]
         if process_this_frame == 0:
             url = constants.recognition_url + "/v1/face-recognition/recognition"
             info1 = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
-            data = json.loads(requests.post(url, data=info1, verify=config.ssl_cacertpath).text)
+            if constants.access_token_enabled and constants.ssl_enabled:
+                access_token = get_access_token()
+                headers = {'Content-Type': 'application/json', 'Authorization': access_token}
+                data = json.loads(requests.post(url, data=info1, headers=headers, verify=config.ssl_cacertpath).text)
+            else:
+                data = json.loads(requests.post(url, data=info1).text)
 
         for info in data:
             top = info[constants.face_position]['top']
@@ -299,10 +305,17 @@ def upload():
             raise IOError('picture format is error')
 
     upload_files = []
+    result = ""
     for file in files:
         upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
 
-    result = requests.post(url, files=upload_files, verify=config.ssl_cacertpath)
+        if constants.access_token_enabled and constants.ssl_enabled:
+            access_token = get_access_token()
+            headers = {'Content-Type': 'application/json', 'Authorization': access_token}
+            result = requests.post(url, files=upload_files, headers = headers, verify=config.ssl_cacertpath)
+        else:
+            result = requests.post(url, files=upload_files)
+
     return result.text
 
 
@@ -335,7 +348,13 @@ def delete_person(person_name):
     person_name = person_name[0:-4]
     url = constants.recognition_url + "/v1/face-recognition/{0}".format(person_name)
 
-    result = requests.delete(url, data=person_name, verify=config.ssl_cacertpath)
+    if constants.access_token_enabled and constants.ssl_enabled:
+        access_token = get_access_token()
+        headers = {'Content-Type': 'application/json', 'Authorization': access_token}
+        result = requests.delete(url, data=person_name, headers = headers, verify=config.ssl_cacertpath)
+    else:
+        result = requests.delete(url, data=person_name)
+
     if result:
         os.remove(app.config['UPLOAD_PATH'] + person)
         time.sleep(1)
@@ -351,7 +370,12 @@ def delete_person(person_name):
 def monitor_messages():
     app.logger.info(constants.received_message + request.remote_addr + constants.operation + request.method + "]" +
                     constants.resource + request.url + "]")
-    return jsonify(listOfMsgs)
+    list_of_msgs = []
+    for msg in listOfMsgs:
+        person_info = msg.copy()
+        person_info["time"] = datetime.datetime.fromtimestamp(temp["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+        list_of_msgs.append(person_info)
+    return jsonify(list_of_msgs)
 
 
 @app.route('/v1/monitor/persons/<person_name>/messages')
@@ -365,6 +389,19 @@ def query_person(person_name):
         if msg["relatedObj"] == person_name:
             return jsonify(msg)
     return Response("person name " + person_name + " doesn't exist")
+
+
+def get_access_token():
+    url = constants.mep_agent + "/mep-agent/v1/token"
+    headers = {'Content-Type': 'application/json'}
+    if config.ssl_enabled:
+        result = requests.get(url, headers=headers, verify=config.ssl_cacertpath)
+    else:
+        result = requests.get(url, headers=headers)
+    # extracting data in json format
+    data = result.json()
+    access_token = data["access_token"]
+    return access_token
 
 
 def start_server(handler):

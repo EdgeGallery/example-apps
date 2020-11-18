@@ -18,6 +18,7 @@ import config
 
 # [Constants]
 recognition_url = "http://" + config.api_gateway + "/" + config.face_recognition
+mep_agent_url = "http://" + config.mep_agent
 frontend_url = "http://" + config.fe_service
 face_position = 'Face position'
 received_message = "Received message from ClientIP ["
@@ -26,3 +27,5 @@ resource = " Resource ["
 person_maxsize = "length of the person name is larger than max size"
 WAIT_SECONDS = 1
 PERSON_TIMEOUT_SECONDS = 15
+access_token_enabled = False
+ssl_enabled = False
