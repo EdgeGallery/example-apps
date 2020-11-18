@@ -33,4 +33,5 @@ ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
 # [Service Configurations]
 api_gateway = os.environ.get("API_GATEWAY", "apigw.mep.org")
 face_recognition = os.environ.get("FACE_RECOGNITION", "facerecognition")
+mep_agent = os.environ.get("MEP_AGENT", "edgegallery.org")
 fe_service = os.environ.get("FE_SERVICE", "front-end")
