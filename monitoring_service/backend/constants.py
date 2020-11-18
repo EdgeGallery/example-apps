@@ -18,8 +18,11 @@ import config
 
 # [Constants]
 recognition_url = "http://" + config.api_gateway + "/" + config.face_recognition
+frontend_url = "http://" + config.fe_service
 face_position = 'Face position'
 received_message = "Received message from ClientIP ["
 operation = "] Operation ["
 resource = " Resource ["
 person_maxsize = "length of the person name is larger than max size"
+WAIT_SECONDS = 1
+PERSON_TIMEOUT_SECONDS = 15
