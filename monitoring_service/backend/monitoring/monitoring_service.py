@@ -373,7 +373,7 @@ def monitor_messages():
     list_of_msgs = []
     for msg in listOfMsgs:
         person_info = msg.copy()
-        person_info["time"] = datetime.datetime.fromtimestamp(temp["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
+        person_info["time"] = datetime.datetime.fromtimestamp(person_info["time"]).strftime("%Y%m%d-%H:%M:%S:" + "321")
         list_of_msgs.append(person_info)
     return jsonify(list_of_msgs)
 
