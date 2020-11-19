@@ -78,7 +78,7 @@ class VideoFile(object):
     通过opencv获取实时视频流
     """
     def __init__(self, video_name):
-        self.video = cv2.VideoCapture(0)
+        self.video = cv2.VideoCapture("/usr/app/test/resources/" + video_name)
         self._person_timeout_check()
 
     def delete(self):
@@ -127,7 +127,7 @@ def send_notification_msg(camera_name, name):
         if len(listOfMsgs) == 0:
             count = count + 1
             newdict = {"msgid": count, "time": time.time(), "relatedObj": name,
-                       "msg": name + " has arrived in front of camera " + camera[0]}
+                       "msg": name + " has appeared in front of camera " + camera[0]}
 
             listOfMsgs.append(newdict)
             person_info = newdict.copy()
@@ -141,7 +141,7 @@ def send_notification_msg(camera_name, name):
         if not flag:
             count = count + 1
             newdict = {"msgid": count, "time": time.time(), "relatedObj": name,
-                       "msg": name + " has arrived in front of camera " + camera[0]}
+                       "msg": name + " has appeared in front of camera " + camera[0]}
             listOfMsgs.append(newdict)
             person_info = newdict.copy()
             person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S")
@@ -332,6 +332,17 @@ def monitor_person(person_name):
         return Response("Image " + person_name + " doesn't exist")
 
 
+@app.route('/v1/monitor/persons')
+def monitor_persons():
+    app.logger.info(constants.received_message + request.remote_addr + constants.operation + request.method + "]" +
+                    constants.resource + request.url + "]")
+    url = constants.frontend_url + "/uploadFile"
+    upload_files = []
+    for root, dirs, files in os.walk(app.config['UPLOAD_PATH']):
+        for file in files:
+            upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file), 'rb')))
+    requests.post(url, files=upload_files)
+    return Response("upload success")
 
 
 @app.route('/v1/monitor/persons/<person_name>', methods=['DELETE'])
