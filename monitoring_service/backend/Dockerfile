@@ -26,7 +26,7 @@ RUN sed -i "s|umask 022|umask 027|g" /etc/profile
 RUN mkdir -p /usr/app
 RUN mkdir -p /usr/app/bin
 RUN mkdir -p /usr/app/monitoring
-RUN mkdir -p /usr/app/resources
+RUN mkdir -p /usr/app/test/resources
 
 # Set the home directory to our app user's home.
 ENV APP_HOME=/usr/app
@@ -68,9 +68,10 @@ RUN apt-get install -y --fix-missing \
 WORKDIR $APP_HOME
 
 # Copy the application & scripts
-COPY config.py requirements.txt run.py $APP_HOME/
+COPY config.py requirements.txt run.py constants.py $APP_HOME/
 COPY monitoring $APP_HOME/monitoring/
-COPY resources $APP_HOME/resources/
+COPY test $APP_HOME/test/
+COPY test/resources $APP_HOME/test/resources/
 COPY configs/*.sh $APP_HOME/bin
 
 RUN chmod 750 $APP_HOME &&\
