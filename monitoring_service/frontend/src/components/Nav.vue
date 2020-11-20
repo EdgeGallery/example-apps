@@ -16,16 +16,34 @@
 
 <template>
   <div class="navgation">
-    <div
-      class="logo lt"
-      @click="jumpLogoTo"
-    >
-      <img
-        src="../assets/images/logo.png"
-        alt=""
+    <div style="width: 50%;">
+      <div
+        class="logo lt"
+        @click="jumpLogoTo"
       >
+        <img
+          src="../assets/images/logo.png"
+          alt=""
+        >
+      </div>
+      <div class="logo-header">
+        <span>Monitoring Service</span>
+      </div>
     </div>
-    <span class="logo-header">Monitoring Service</span>
+    <div class="AddDetais">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item>
+          <span @click="addVideoEnable()">
+            Add Video
+          </span>
+        </el-breadcrumb-item>
+        <el-breadcrumb-item>
+          <span @click="addCameraEnable()">
+            Add Camera
+          </span>
+        </el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
   </div>
 </template>
 
@@ -36,7 +54,9 @@ export default {
   },
   data () {
     return {
-      language: 'English'
+      language: 'English',
+      isaddVideo: true,
+      isaddCamera: true
     }
   },
   watch: {
@@ -46,6 +66,12 @@ export default {
   methods: {
     jumpLogoTo () {
       this.$router.push('/')
+    },
+    addVideoEnable () {
+      this.$root.$emit('addVideoEnable', this.isaddVideo)
+    },
+    addCameraEnable () {
+      this.$root.$emit('addCameraEnable', this.isaddCamera)
     }
   }
 }
@@ -53,12 +79,15 @@ export default {
 
 <style lang='less' scoped>
 .navgation{
-  background: #282B33;
+  background-image: linear-gradient(to right, #404b5f, #587cb9, #F0F3FA);
+  // background-image: linear-gradient(to right, #650675, #115286, #F0F3FA);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   height: 65px;
   top: 0px;
   width: 100%;
   position: fixed;
   z-index: 2;
+  display: flex;
   .logo{
     height:65px;
     width:200px;
@@ -75,7 +104,19 @@ export default {
     font-size: 23px;
     color: white;
     font-weight: bold;
-    line-height: 60px;
+    display: flex;
+    flex-direction: column;
+    height: 65px;
+    width: 223px;
+    justify-content: center;
+        margin-left: 17px;
+  }
+  .AddDetais{
+    display: flex;
+    height:65px;
+    width:50%;
+    justify-content: flex-end;
+    align-items: center
   }
 }
 </style>

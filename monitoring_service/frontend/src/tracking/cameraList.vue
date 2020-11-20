@@ -14,20 +14,23 @@
  *  limitations under the License.
  */
 <template>
-  <el-table
+  <el-search-table-pagination
+    type="local"
     :data="data"
-    height="300"
-  >
-    <el-table-column
-      v-for="column in cameracolumns"
-      :key="column.prop"
-      :prop="column.prop"
-      :label="column.label"
-      :width="column.width"
-    />
-  </el-table>
+    height="235"
+    :page-sizes="[3, 10]"
+    :columns="cameracolumns"
+  />
 </template>
 <script lang="js">
+import axios from 'axios'
+import Vue from 'vue'
+import ElSearchTablePagination from 'el-search-table-pagination'
+Vue.use(ElSearchTablePagination)
+Vue.use(ElSearchTablePagination, {
+  axios
+})
+
 export default {
   name: 'CameraList',
   props: {

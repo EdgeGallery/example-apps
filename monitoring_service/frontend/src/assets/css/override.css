@@ -1,0 +1,101 @@
+/*
+ *  Copyright 2020 Huawei Technologies Co., Ltd.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+
+/* monitor-service */
+.el-upload-dragger{
+    width:100% ;
+  }
+  .el-tabs--border-card {
+    background:none ;
+    border: none ;
+  }
+  .el-table, .el-table__expanded-cell {
+    background-color: transparent ;
+    color: white ;
+  }
+  .el-tabs--border-card>.el-tabs__header {
+     background:none ;
+  }
+  .el-table--enable-row-hover .el-table__body tr:hover>td {
+    background-color: #020513ad ;
+  }
+  .el-upload--picture-card {
+    background-color: transparent 
+  }
+  .el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active {
+        color: #409EFF;
+        background-color: transparent ;
+  }
+  .el-tabs--border-card>.el-tabs__header .el-tabs__item{
+       border: none 
+  }
+  .el-table td, .el-table th.is-leaf {
+    border-bottom: 1px solid #ffffff69 ;
+  }
+  .el-dialog__body {
+    padding: 30px 52px 15px ;
+  }
+  .el-dialog__footer {
+    padding: 0px 48px 20px  ;
+  }
+  .el-breadcrumb {
+    padding-right: 5%;
+  }
+  .el-breadcrumb__inner {
+    color:#0d4673;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .el-breadcrumb__item:last-child .el-breadcrumb__inner, .el-breadcrumb__item:last-child .el-breadcrumb__inner a, .el-breadcrumb__item:last-child .el-breadcrumb__inner a:hover, .el-breadcrumb__item:last-child .el-breadcrumb__inner:hover{
+    color: #0d4673;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .el-pagination__jump {
+    color: white;
+  }
+  .el-pagination__total{
+    color: white;
+  }
+  .el-breadcrumb__separator {
+    color:#0d4673;
+  }
+  .el-table tr {
+    background-color: transparent !important;
+  }
+  .el-table::before {
+  background-color:transparent !important;
+  }  
+  .el-tabs__item {
+    color: white !important;
+    font-weight: bold;
+  }
+  .el-tabs--border-card{
+    box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important;
+  }
+  .el-tabs__nav {
+    z-index:0 !important;
+  }
+  .el-tabs--border-card>.el-tabs__content {
+    padding: 1% !important;
+  }
+  .el-card {
+    border: none;
+    background-color: transparent;
+    color: #FFF;
+    box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important
+  }

@@ -15,25 +15,6 @@
  */
 <template>
   <div class="camera-display">
-    <div class="padding-1">
-      <span class=" font-size-20x">
-        Live Streaming
-      </span>
-      <el-button
-        type="primary"
-        @click="dialogFormVisible = true"
-        class="add-cam"
-      >
-        Add Camera
-      </el-button>
-      <el-button
-        type="primary"
-        @click="dialogvideoFrom = true"
-        class="add-cam mar-rgt-1p"
-      >
-        Add Video
-      </el-button>
-    </div>
     <!--add video-->
     <el-dialog
       title="Add video"
@@ -84,23 +65,14 @@
           />
         </el-form-item>
         <el-form-item
-          label="Zones"
+          label="Location"
           prop="location"
           :label-width="formLabelWidth"
         >
-          <el-select
+          <el-input
             v-model="formData.location"
-            placeholder="Please select a zone"
-          >
-            <el-option
-              label="shanghai-lab"
-              value="shanghai-lab"
-            />
-            <el-option
-              label="beijing-lab"
-              value="beijing-lab"
-            />
-          </el-select>
+            autocomplete="off"
+          />
         </el-form-item>
         <el-form-item
           label="RTSPurl"
@@ -180,6 +152,14 @@ export default {
   },
   mounted () {
     this.getCameras()
+  },
+  beforeMount () {
+    this.$root.$on('addVideoEnable', (data) => {
+      this.dialogvideoFrom = data
+    })
+    this.$root.$on('addCameraEnable', (data) => {
+      this.dialogFormVisible = data
+    })
   },
   methods: {
     // add camera details
@@ -282,7 +262,7 @@ export default {
             this.cameraList = response.data
             this.$root.$emit('updateCamera', this.cameraList)
             for (let i = 0; i <= this.cameraList.length; i++) {
-              this.cameraList[i]['stramedUrl'] = `http://localhost:3000/v1/monitor/cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
+              this.cameraList[i]['stramedUrl'] = `http://localhost:9997/v1/monitor/cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
             }
           }
         })
@@ -313,35 +293,14 @@ export default {
 </script>
 
 <style scoped lang="less">
-.video-cards{
-    width: 400px;
-    height: 250px;
-}
 .cams-container{
-    padding: 1%;
-}
-.camera-id{
-  font-size: 20px;
-  padding-top: 2%;
-}
-.add-cam{
-  float: right;
-  margin-bottom: 20px;
+    width: 48%;
 }
 .camera_pannel{
     width: 100%;
     display: flex;
-    flex-wrap: wrap;
-}
-.padding-1{
-  padding: 1% 0% 1% 0%;
-}
-.font-size-20x {
-  font-size: 20px;
-  font-weight: bold
-}
-.mar-rgt-1p{
-  margin-right: 1%;
+    justify-content: space-between;
+    margin-top: 15px;
 }
 .upload-video {
     font-size: 16px;
@@ -356,5 +315,4 @@ export default {
   padding: 1%;
   border: 1px solid #9e9e9e33;
 }
-
 </style>

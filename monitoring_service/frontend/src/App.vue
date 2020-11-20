@@ -51,7 +51,4 @@ body {
   background: #f5f5f5;
   max-height: 100vh;
 }
-.el-tabs__nav {
-  z-index:0 !important;
-}
 </style>
