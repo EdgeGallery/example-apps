@@ -295,12 +295,14 @@ export default {
 <style scoped lang="less">
 .cams-container{
     width: 47%;
+    padding: 1%;
 }
 .camera_pannel{
     width: 100%;
     display: flex;
     justify-content: space-around;
     margin-top: 15px;
+    flex-wrap: wrap
 }
 .upload-video {
     font-size: 16px;
@@ -315,4 +317,5 @@ export default {
   padding: 1%;
   border: 1px solid #9e9e9e33;
 }
+
 </style>

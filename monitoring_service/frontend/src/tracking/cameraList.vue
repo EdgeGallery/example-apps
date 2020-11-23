@@ -17,8 +17,8 @@
   <el-search-table-pagination
     type="local"
     :data="data"
-    height="235"
-    :page-sizes="[3, 10]"
+    height="255"
+    :page-sizes="[4, 10]"
     :columns="cameracolumns"
   />
 </template>
