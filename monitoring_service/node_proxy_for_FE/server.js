@@ -109,7 +109,7 @@ async function deleteFiles () {
   });
 }
 
-const server = app.listen(port, () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${port}`)
 })
 
