@@ -15,7 +15,7 @@
  */
 <template>
   <div class="top-container">
-    <div class="width-48">
+    <div class="width-47">
       <el-tabs type="border-card">
         <el-tab-pane style="height:300px; overflow: auto;">
           <span slot="label"><i class="el-icon-user" /> Persons</span>
@@ -91,7 +91,7 @@
         >
       </el-dialog>
     </div>
-    <div class="width-48">
+    <div class="width-47">
       <el-tabs
         type="border-card"
         @tab-click="handleClick"
@@ -186,7 +186,7 @@ export default {
     // Client receives the message:
     const socket = io.connect(baseUrl.baseUrl_NodeProxy)
     socket.on('notify', (data) => {
-      Notification.error({
+      Notification.success({
         title: data.relatedObj,
         position: 'bottom-right',
         duration: 3000,
@@ -310,13 +310,13 @@ export default {
 </script>
 
 <style scoped lang="less">
-.width-48{
-  width: 48%
+.width-47{
+  width: 47%
 }
 .top-container{
    display: flex;
    height: 380px;
-   justify-content: space-between;
+   justify-content: space-around;
    padding-top: 1%;
 }
 .el-upload {

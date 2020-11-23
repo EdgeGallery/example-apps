@@ -51,7 +51,6 @@ export default {
   left: 0;
   right: 0;
   margin-top: 64px;
-  padding: 0 30px;
   // background-image: url("../assets/images/home.png");
   //  background-image: linear-gradient(to right, #650675, #115286, #F0F3FA);
   background-image: linear-gradient(to right, #650675, #115286, #6d727d);
