@@ -39,7 +39,7 @@ app.get('/', function(req, res) {
 
 app.get('/persons', function(req, res)  {
   deleteFiles();
-  axios.get('http://127.0.0.1:3000/v1/monitor/persons')
+  axios.get('http://127.0.0.1:9997/v1/monitor/persons')
   .then(function (response) {
     if(res.statusCode == 200) {
       fs.readdir('./public', (err, files) => {
@@ -109,7 +109,7 @@ async function deleteFiles () {
   });
 }
 
-const server = app.listen(port, () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${port}`)
 })
 

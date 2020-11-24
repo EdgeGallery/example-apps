@@ -91,7 +91,7 @@
         >
       </el-dialog>
     </div>
-    <div class="width-50">
+    <div class="width-47">
       <el-tabs
         type="border-card"
         @tab-click="handleClick"
@@ -104,18 +104,13 @@
         </el-tab-pane>
         <el-tab-pane>
           <span slot="label"><i class="el-icon-message" /> Messages</span>
-          <el-table
+          <el-search-table-pagination
+            type="local"
             :data="queryMeassages"
-            height="300"
-          >
-            <el-table-column
-              v-for="column in columns"
-              :key="column.prop"
-              :prop="column.prop"
-              :label="column.label"
-              :width="column.width"
-            />
-          </el-table>
+            height="235"
+            :page-sizes="[3, 10]"
+            :columns="columns"
+          />
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -129,6 +124,12 @@ import baseUrl from '@/config'
 import io from 'socket.io-client'
 import { Notification } from 'element-ui'
 import updatedCameraList from './cameraList.vue'
+import Vue from 'vue'
+import ElSearchTablePagination from 'el-search-table-pagination'
+Vue.use(ElSearchTablePagination)
+Vue.use(ElSearchTablePagination, {
+  axios
+})
 
 export default {
   name: 'Persons',
@@ -185,11 +186,12 @@ export default {
     // Client receives the message:
     const socket = io.connect(baseUrl.baseUrl_NodeProxy)
     socket.on('notify', (data) => {
-      Notification.error({
+      Notification.success({
         title: data.relatedObj,
         position: 'bottom-right',
         duration: 3000,
-        message: `${data.msg} \n  on ${data.time}`
+        message: `${data.msg} \n  on ${data.time}`,
+        method: this.this.getMessages()
       })
     })
   },
@@ -204,7 +206,6 @@ export default {
         URL,
         dd
       ).then(response => {
-        this.getMessages()
       }).catch(error => {
         this.errorMessage = error.message
       })
@@ -309,22 +310,14 @@ export default {
 </script>
 
 <style scoped lang="less">
-.photo-pannel{
-    background: white;
-    height: 316px;
-    padding: 1%;
-    overflow: auto;
-}
 .width-47{
   width: 47%
-}
-.width-50{
-  width: 50%
 }
 .top-container{
    display: flex;
    height: 380px;
-   justify-content: space-between;
+   justify-content: space-around;
+   padding-top: 1%;
 }
 .el-upload {
    .el-upload--picture-card {
@@ -348,11 +341,4 @@ export default {
   font-size: 40px;
   cursor: pointer;
 }
-.padding-1{
-  padding: 1% 0% 1% 0%;
-}
-.font-size-20x {
-  font-size: 20px;
-}
-
 </style>

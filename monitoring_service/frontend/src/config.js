@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 export default {
-  baseUrl: 'https://localhost:3000/v1/monitor/',
+  baseUrl: 'http://localhost:9997/v1/monitor/',
 
-  baseUrl_NodeProxy: 'https://localhost:5000/'
+  baseUrl_NodeProxy: 'http://localhost:5000/'
 }

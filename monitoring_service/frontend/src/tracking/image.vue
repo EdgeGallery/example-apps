@@ -14,27 +14,26 @@
  *  limitations under the License.
  */
 <template>
-  <div
-    class="cameraview"
-  >
-    <span
-      class="delete-icon"
-    >
-      <el-button
-        type="danger"
-        style="padding: 0px"
-        icon="el-icon-close"
-        @click="beforeDeleteCamera (data.name)"
-      />
-    </span>
+  <el-card :body-style="{ padding: '0px' }">
     <img
-      class="video-cards"
       :id="data.name"
+      class="video-cards"
       :src="data.stramedUrl"
-    ><br>
-    <br>
-    <label class="camera-id">{{ data.name.split('-')[0] }} is at {{ data.location }}</label>
-  </div>
+    >
+    <div style="padding: 14px;">
+      <div class="camera-details-con">
+        <div class="bottom clearfix cd-text">
+          <label class="camera-id">{{ data.name.split('-')[0] }} is at {{ data.location }}</label>
+        </div>
+        <el-button
+          type="primary"
+          icon="el-icon-delete"
+          @click="beforeDeleteCamera (data.name)"
+          style="padding: 5px"
+        />
+      </div>
+    </div>
+  </el-card>
 </template>
 
 <script>
@@ -84,19 +83,15 @@ export default {
 
 <style scoped lang="less">
 .video-cards{
-    width: 400px;
-    height: 250px;
-    border: 2px solid;
+    width: 100%;
+    height: 380px;
 }
-.delete-icon{
-    position: absolute;
-    right: -3px;
-    top: 0;
-    font-size: 20px;
-    color: #606266;
+.camera-details-con {
+    display: flex;
+    justify-content: space-between;
 }
-.cameraview{
-    padding: 1%;
+.cd-text{
+    font-size: 22px;
+    font-weight: bold;
 }
-
 </style>
