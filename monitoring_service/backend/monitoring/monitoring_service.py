@@ -172,22 +172,7 @@ def video(video_capture, camera_name):
                 data = json.loads(requests.post(url, data=info1).text)
 
         for info in data:
-            top = info[constants.face_position]['top']
-            right = info[constants.face_position]['right']
-            bottom = info[constants.face_position]['bottom']
-            left = info[constants.face_position]['left']
             name = info['Name']
-            # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-            top *= 2
-            right *= 2
-            bottom *= 2
-            left *= 2
-            # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-            # Draw a label with a name below the face
-            cv2.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.8, (255, 255, 255), 1)
             send_notification_msg(camera_name, name)
 
         ret, jpeg = cv2.imencode('.jpg', frame)
