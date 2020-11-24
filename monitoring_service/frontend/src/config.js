@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 export default {
-  baseUrl: 'http://localhost:9997/v1/monitor/',
+  baseUrl: 'http://monitoring-be-service:9997/v1/monitor/',
 
-  baseUrl_NodeProxy: 'http://localhost:5000/'
+  baseUrl_NodeProxy: 'http://monitoring-proxy-service:5000/'
 }

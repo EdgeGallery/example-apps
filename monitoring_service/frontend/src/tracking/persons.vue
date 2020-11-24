@@ -60,7 +60,7 @@
           </ul>
           <el-upload
             class="el-upload-list el-upload-list--picture-card"
-            action="http://localhost:3000/v1/monitor/persons"
+            action="http://monitoring-be-service:9997/v1/monitor/persons"
             list-type="picture-card"
             :on-success="getPersons"
             :show-file-list="false"

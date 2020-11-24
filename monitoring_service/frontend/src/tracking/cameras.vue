@@ -262,7 +262,7 @@ export default {
             this.cameraList = response.data
             this.$root.$emit('updateCamera', this.cameraList)
             for (let i = 0; i <= this.cameraList.length; i++) {
-              this.cameraList[i]['stramedUrl'] = `http://localhost:9997/v1/monitor/cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
+              this.cameraList[i]['stramedUrl'] = `http://monitoring-be-service:9997/v1/monitor/cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
             }
           }
         })
