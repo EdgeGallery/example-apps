@@ -18,7 +18,7 @@ import config
 import os
 
 # [Constants]
-recognition_url = "http://" + config.api_gateway + "/" + config.face_recognition
+recognition_url = "http://" + config.api_gateway
 mep_agent_url = "http://" + config.mep_agent
 frontend_url = "http://" + config.fe_service
 face_position = 'Face position'
