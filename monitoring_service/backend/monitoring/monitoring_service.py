@@ -39,6 +39,7 @@ app.config['VIDEO_PATH'] = '/usr/app/test/resources'
 app.config['supports_credentials'] = True
 app.config['CORS_SUPPORTS_CREDENTIALS'] = True
 count = 0
+now = 0.0
 listOfMsgs = []
 listOfCameras = []
 listOfVideos = []
@@ -51,8 +52,9 @@ class VideoCamera(object):
     通过opencv获取实时视频流
     """
     def __init__(self, url):
+        if url == "0":
+            url = int(url)
         self.video = cv2.VideoCapture(url)
-        self._person_timeout_check()
 
     def delete(self):
         self.video.release()
@@ -63,14 +65,6 @@ class VideoCamera(object):
         """
         success, image = self.video.read()
         return success, image
-
-    def _person_timeout_check(self):
-        threading.Timer(constants.WAIT_SECONDS, self._person_timeout_check).start()
-        # logger.debug("Timeout processing")
-        now = time.time()
-        for msg in listOfMsgs:
-            if now - msg["time"] > constants.PERSON_TIMEOUT_SECONDS:
-                listOfMsgs.remove(msg)
 
 
 class VideoFile(object):
@@ -79,7 +73,6 @@ class VideoFile(object):
     """
     def __init__(self, video_name):
         self.video = cv2.VideoCapture("/usr/app/test/resources/" + video_name)
-        self._person_timeout_check()
 
     def delete(self):
         self.video.release()
@@ -91,13 +84,7 @@ class VideoFile(object):
         success, image = self.video.read()
         return success, image
 
-    def _person_timeout_check(self):
-        threading.Timer(constants.WAIT_SECONDS, self._person_timeout_check).start()
-        # logger.debug("Timeout processing")
-        now = time.time()
-        for msg in listOfMsgs:
-            if now - msg["time"] > constants.PERSON_TIMEOUT_SECONDS:
-                listOfMsgs.remove(msg)
+
 
 
 def allowed_file(filename):
