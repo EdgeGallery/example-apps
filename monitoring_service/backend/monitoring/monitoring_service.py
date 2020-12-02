@@ -356,6 +356,12 @@ def monitor_messages():
     list_of_msgs = []
     for msg in listOfMsgs:
         person_info = msg.copy()
+        current_time = time.time()
+        person_info["highlight"] = "False"
+        if current_time - person_info["time"] < 15:
+            person_info["highlight"] = "True"
+        if current_time - person_info["time"] < 15 and person_info["cam_flag"] == "enable":
+            person_info["highlight"] = "True"
         person_info["time"] = datetime.datetime.fromtimestamp(person_info["time"]).strftime("%Y%m%d-%H:%M:%S")
         list_of_msgs.append(person_info)
     return jsonify(list_of_msgs)
