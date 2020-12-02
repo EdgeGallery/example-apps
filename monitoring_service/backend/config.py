@@ -18,7 +18,7 @@ import os
 
 # [Server Configurations]
 server_port = 9997
-server_address = os.environ.get('LISTEN_IP')
+server_address = os.environ.get('LISTEN_IP', "127.0.0.1")
 
 # [SSL Configurations]
 ssl_enabled = False
@@ -31,7 +31,7 @@ ssl_cacertpath = "/usr/app/ssl/ca.crt"
 ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
 
 # [Service Configurations]
-api_gateway = os.environ.get("API_GATEWAY", "apigw.mep.org")
+api_gateway = os.environ.get("API_GATEWAY", "face-recognition:9999")
 face_recognition = os.environ.get("FACE_RECOGNITION", "facerecognition")
 mep_agent = os.environ.get("MEP_AGENT", "edgegallery.org")
-fe_service = os.environ.get("FE_SERVICE", "front-end")
+fe_service = os.environ.get("FE_SERVICE", "monitoring-proxy-service:5000")
