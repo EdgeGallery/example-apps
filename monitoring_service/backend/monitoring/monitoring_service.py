@@ -238,9 +238,9 @@ def delete_camera(camera_name):
             listOfCameras.remove(camera)
     time.sleep(1)
     camera = camera_name.split("-")
-    for msg in listOfMsgs:
-        if camera[0] in msg["msg"]:
-            listOfMsgs.remove(msg)
+    for msg in reversed(range(len(listOfMsgs))):
+        if camera[0] in listOfMsgs[msg]['msg']:
+            del listOfMsgs[msg]
     return Response("success")
 
 
@@ -284,7 +284,7 @@ def upload():
         if constants.access_token_enabled and constants.ssl_enabled:
             access_token = get_access_token()
             headers = {'Content-Type': 'application/json', 'Authorization': access_token}
-            result = requests.post(url, files=upload_files, headers = headers, verify=config.ssl_cacertpath)
+            result = requests.post(url, files=upload_files, headers=headers, verify=config.ssl_cacertpath)
         else:
             result = requests.post(url, files=upload_files)
 
@@ -334,16 +334,16 @@ def delete_person(person_name):
     if constants.access_token_enabled and constants.ssl_enabled:
         access_token = get_access_token()
         headers = {'Content-Type': 'application/json', 'Authorization': access_token}
-        result = requests.delete(url, data=person_name, headers = headers, verify=config.ssl_cacertpath)
+        result = requests.delete(url, data=person_name, headers=headers, verify=config.ssl_cacertpath)
     else:
         result = requests.delete(url, data=person_name)
 
     if result:
         os.remove(app.config['UPLOAD_PATH'] + person)
         time.sleep(1)
-        for msg in listOfMsgs:
-            if person_name in msg["relatedObj"]:
-                listOfMsgs.remove(msg)
+        for msg in reversed(range(len(listOfMsgs))):
+            if listOfMsgs[msg]['relatedObj'] == person_name:
+                del listOfMsgs[msg]
         return jsonify({'Result': 'delete success'})
     else:
         return jsonify({"Result": "the name is not exist"})
