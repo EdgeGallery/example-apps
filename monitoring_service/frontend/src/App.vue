@@ -51,4 +51,7 @@ body {
   background: #f5f5f5;
   max-height: 100vh;
 }
+.el-tabs--border-card>.el-tabs_header .el-tabs_item {
+    border : none !important
+}
 </style>

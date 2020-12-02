@@ -106,7 +106,7 @@ li{
 .el-dialog__header{
   background: #409EFF;
 }
-.el-dialog__headerbtn:focus .el-dialog__close, .el-dialog__headerbtn:hover .el-dialog__close,.el-dialog__title,.el-icon-close,.el-dialog__headerbtn .el-dialog__close{
+.el-dialog_headerbtn:focus .el-dialogclose, .el-dialogheaderbtn:hover .el-dialogclose,.el-dialogtitle,.el-icon-close,.el-dialogheaderbtn .el-dialog_close{
   color:#fff;
 }
 
@@ -138,9 +138,25 @@ body .el-table th.gutter{
 .area-select>.area-selected-trigger{
   padding-top:0px !important;
 }
-
-
+.el-table .warning-row {
+  background-color: #020513ad !important;
+}
+.el-table .success-row {
+  background-color: transparent ;
+}
+.highlight {
+  color: #0d4673;
+  font-weight: bold;
+  cursor: pointer;
+}
+.tabs-border {  
+  border-right-color: transparent !important;
+  border-left-color: transparent !important;
+}
 /* .el-upload{
   width:100% !important;
 } */
-
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active {
+    background-color: transparent;
+    border: none !important;
+}

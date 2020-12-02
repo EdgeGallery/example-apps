@@ -17,7 +17,10 @@
   <div class="top-container">
     <div class="width-47">
       <el-tabs type="border-card">
-        <el-tab-pane style="height:300px; overflow: auto;">
+        <el-tab-pane
+          style="height:300px; overflow: auto;"
+          class="tabs-border"
+        >
           <span slot="label"><i class="el-icon-user" /> Persons</span>
           <ul
             class="el-upload-list el-upload-list--picture-card"
@@ -60,7 +63,7 @@
           </ul>
           <el-upload
             class="el-upload-list el-upload-list--picture-card"
-            action="http://monitoring-be-service:9997/v1/monitor/persons"
+            :action="baseURL"
             list-type="picture-card"
             :on-success="getPersons"
             :show-file-list="false"
@@ -96,21 +99,27 @@
         type="border-card"
         @tab-click="handleClick"
       >
-        <el-tab-pane>
+        <el-tab-pane class="tabs-border">
           <span slot="label"><i class="el-icon-camera" /> Cameras</span>
           <updatedCameraList
             :data="upDatedCameralist"
           />
         </el-tab-pane>
-        <el-tab-pane>
+        <el-tab-pane class="tabs-border">
           <span slot="label"><i class="el-icon-message" /> Messages</span>
-          <el-search-table-pagination
-            type="local"
+          <el-table
             :data="queryMeassages"
-            height="235"
-            :page-sizes="[3, 10]"
-            :columns="columns"
-          />
+            height="300"
+            :row-class-name="tableRowClassName"
+          >
+            <el-table-column
+              v-for="column in columns"
+              :key="column.prop"
+              :prop="column.prop"
+              :label="column.label"
+              :width="column.width"
+            />
+          </el-table>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -122,14 +131,7 @@
 import axios from 'axios'
 import baseUrl from '@/config'
 import io from 'socket.io-client'
-import { Notification } from 'element-ui'
 import updatedCameraList from './cameraList.vue'
-import Vue from 'vue'
-import ElSearchTablePagination from 'el-search-table-pagination'
-Vue.use(ElSearchTablePagination)
-Vue.use(ElSearchTablePagination, {
-  axios
-})
 
 export default {
   name: 'Persons',
@@ -138,6 +140,7 @@ export default {
     // showUpload: true,
       videos: '',
       dialogImageUrl: '',
+      baseURL: baseUrl.baseUrl + 'persons',
       dialogVisible: false,
       disabled: false,
       personsList: [],
@@ -159,10 +162,10 @@ export default {
         ]
       },
       columns: [
-        { prop: 'relatedObj', label: 'Name', width: 100 },
-        { prop: 'msg', label: 'Arrived At', minWidth: 180 },
-        { prop: 'msgid', label: 'MsgID', minWidth: 180 },
-        { prop: 'time', label: 'Time', width: 140 }
+        { prop: 'relatedObj', label: 'Name', width: 120 },
+        { prop: 'msg', label: 'Arrived At', minWidth: 260 },
+        { prop: 'msgid', label: 'MsgID', width: 80 },
+        { prop: 'time', label: 'Time', width: 180 }
       ],
       isPersonsClicked: false
     }
@@ -181,18 +184,15 @@ export default {
         return container
       })
     })
+    this.$root.$on('updateMessages', (data) => {
+      this.queryMeassages = data
+    })
   },
   created () {
     // Client receives the message:
     const socket = io.connect(baseUrl.baseUrl_NodeProxy)
     socket.on('notify', (data) => {
-      Notification.success({
-        title: data.relatedObj,
-        position: 'bottom-right',
-        duration: 3000,
-        message: `${data.msg} \n  on ${data.time}`,
-        method: this.this.getMessages()
-      })
+      this.getMessages()
     })
   },
   mounted () {
@@ -238,6 +238,10 @@ export default {
       axios.get(URL)
         .then(response => {
           this.queryMeassages = response.data
+          setTimeout(function () {
+            this.getMessages()
+          }.bind(this),
+          15000)
         })
         .catch(error => {
           this.errorMessage = error.message
@@ -284,13 +288,17 @@ export default {
         })
       })
     },
+    tableRowClassName ({ row, rowIndex }) {
+      if (row.highlight === 'True') {
+        return 'warning-row'
+      } else if (row.highlight === 'False') {
+        return 'success-row'
+      }
+    },
     // Tabs
     handleClick (tab, event) {
       if (event.target.textContent.includes('Messages')) {
         this.getMessages()
-      }
-      if (event.target.textContent.includes('Cameras')) {
-        this.getCamerasList()
       }
     },
     // Query only one persons Messages

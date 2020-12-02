@@ -13,8 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-export default {
-  baseUrl: 'http://monitoring-be-service:9997/v1/monitor/',
 
-  baseUrl_NodeProxy: 'http://monitoring-proxy-service:5000/'
+var host = window.location.hostname
+export default {
+
+  baseUrl: 'http://' + host + ':32115/v1/monitor/',
+
+  baseUrl_NodeProxy: 'http://' + host + ':32117/'
 }

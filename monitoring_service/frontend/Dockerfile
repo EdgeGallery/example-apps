@@ -44,6 +44,8 @@ WORKDIR $APP_HOME
 
 COPY package*.json ./
 
+COPY . .
+
 RUN chmod 750 $APP_HOME &&\
     chmod -R 550 $APP_HOME/bin &&\
     mkdir -p -m 750 $APP_HOME/log &&\
@@ -51,8 +53,6 @@ RUN chmod 750 $APP_HOME &&\
 
 # Install requirements
 RUN npm install
-
-COPY . .
 
 # Exposed port
 EXPOSE 8080
