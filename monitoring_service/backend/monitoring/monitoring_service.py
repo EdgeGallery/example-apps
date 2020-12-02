@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 import cv2
 import requests
 import os
@@ -84,7 +83,11 @@ class VideoFile(object):
         success, image = self.video.read()
         return success, image
 
-
+    def reset_frame(self):
+        """
+        获取实时视频流
+        """
+        self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
 
 def allowed_file(filename):
@@ -107,32 +110,85 @@ def allowed_videofile(filename):
 
 def send_notification_msg(camera_name, name):
     global count
+    global now
 
     url = constants.frontend_url + "/notify"
     camera = camera_name.split("-")
     if name != "unknown":
+        if len(listOfMsgs) >= 100:
+            listOfMsgs.pop()
         if len(listOfMsgs) == 0:
             count = count + 1
-            newdict = {"msgid": count, "time": time.time(), "relatedObj": name,
+            newdict = {"msgid": count, "time": time.time(), "relatedObj": name, "cam_flag": "disable",
                        "msg": name + " has appeared in front of camera " + camera[0]}
+            listOfMsgs.insert(0, newdict)
+            requests.post(url, json=newdict)
+        now = time.time()
 
-            listOfMsgs.append(newdict)
-            person_info = newdict.copy()
-            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S")
-            requests.post(url, json=person_info)
-        flag = False
+        person_flag = False
         for msg in listOfMsgs:
             if name in msg.values():
+                person_flag = True
+                break
+
+        if not person_flag:
+            count = count + 1
+            newdict = {"msgid": count, "time": time.time(), "relatedObj": name, "cam_flag": "enable",
+                       "msg": name + " has appeared in front of camera " + camera[0]}
+            listOfMsgs.insert(0, newdict)
+            requests.post(url, json=newdict)
+
+        flag = False
+        cam_flag = False
+        for msg in listOfMsgs:
+            if name not in msg.values():
+                continue
+            if name in msg.values() and now - msg["time"] > 15:
                 flag = True
                 break
-        if not flag:
+            message = msg["msg"]
+            words = message.split()
+            cam = words[-1]
+            if name in msg.values() and now - msg["time"] < 15 and camera[0] != cam:
+                flag = True
+                cam_flag = True
+                break
+            if name in msg.values() and now - msg["time"] < 15:
+                break
+
+        if flag and cam_flag:
             count = count + 1
-            newdict = {"msgid": count, "time": time.time(), "relatedObj": name,
+            newdict = {"msgid": count, "time": time.time(), "relatedObj": name, "cam_flag": "enable",
+                        "msg": name + " has appeared in front of camera " + camera[0]}
+            listOfMsgs.insert(0, newdict)
+            requests.post(url, json=newdict)
+        elif flag:
+            count = count + 1
+            newdict = {"msgid": count, "time": time.time(), "relatedObj": name, "cam_flag": "disable",
                        "msg": name + " has appeared in front of camera " + camera[0]}
-            listOfMsgs.append(newdict)
-            person_info = newdict.copy()
-            person_info["time"] = datetime.datetime.fromtimestamp(newdict["time"]).strftime("%Y%m%d-%H:%M:%S")
-            requests.post(url, json=person_info)
+            listOfMsgs.insert(0, newdict)
+            requests.post(url, json=newdict)
+
+
+def thread_function(frame, camera_name):
+    app.logger.info("Thread starting")
+
+    small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    # Convert the image from BGR color  to RGB color
+    rgb_small_frame = small_frame[:, :, ::-1]
+
+    url = constants.recognition_url + "/v1/face-recognition/recognition"
+    info1 = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
+    if constants.access_token_enabled and constants.ssl_enabled:
+        access_token = get_access_token()
+        headers = {'Content-Type': 'application/json', 'Authorization': access_token}
+        data = json.loads(requests.post(url, data=info1, headers=headers, verify=config.ssl_cacertpath).text)
+    else:
+        data = json.loads(requests.post(url, data=info1).text)
+
+    for info in data:
+        name = info['Name']
+        send_notification_msg(camera_name, name)
 
 
 def video(video_capture, camera_name):
@@ -143,29 +199,18 @@ def video(video_capture, camera_name):
     while True:
         success, frame = video_capture.get_frame()
         if not success:
-            break
-        small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-        data = ""
-        # Convert the image from BGR color  to RGB color
-        rgb_small_frame = small_frame[:, :, ::-1]
+            video_capture.reset_frame()
+            continue
         if process_this_frame == 0:
-            url = constants.recognition_url + "/v1/face-recognition/recognition"
-            info1 = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
-            if constants.access_token_enabled and constants.ssl_enabled:
-                access_token = get_access_token()
-                headers = {'Content-Type': 'application/json', 'Authorization': access_token}
-                data = json.loads(requests.post(url, data=info1, headers=headers, verify=config.ssl_cacertpath).text)
-            else:
-                data = json.loads(requests.post(url, data=info1).text)
+            x = threading.Thread(target=thread_function, args=(frame, camera_name,))
+            x.start()
 
-        for info in data:
-            name = info['Name']
-            send_notification_msg(camera_name, name)
+        process_this_frame = process_this_frame + 1
+        if process_this_frame == 10:
+            process_this_frame = 0
 
         ret, jpeg = cv2.imencode('.jpg', frame)
-        process_this_frame = process_this_frame + 1
-        if process_this_frame == 2:
-            process_this_frame = 0
+        time.sleep(.07)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
 
@@ -210,7 +255,7 @@ def get_camera(name, rtspurl, location):
     camera_info = {"name": name, "rtspurl": rtspurl, "location": location}
     if "mp4" in camera_info["rtspurl"]:
         video_file = VideoFile(camera_info["rtspurl"])
-        video_dict = {camera_info["name"]:video_file}
+        video_dict = {camera_info["name"]: video_file}
         listOfVideos.append(video_dict)
         return Response(video(video_file, camera_info["name"]),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -218,8 +263,7 @@ def get_camera(name, rtspurl, location):
         video_file = VideoCamera(camera_info["rtspurl"])
         video_dict = {camera_info["name"]: video_file}
         listOfVideos.append(video_dict)
-        return Response(video(video_file, camera_info["name"]),
-                     mimetype='multipart/x-mixed-replace; boundary=frame')
+        return Response(video(video_file, camera_info["name"]), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/v1/monitor/cameras/<camera_name>', methods=['DELETE'])
