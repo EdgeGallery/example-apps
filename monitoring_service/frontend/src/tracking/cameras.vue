@@ -75,7 +75,7 @@
           />
         </el-form-item>
         <el-form-item
-          label="RTSPurl"
+          label="RTSP/VIDEO"
           prop="rtspurl"
           :label-width="formLabelWidth"
         >
@@ -143,6 +143,7 @@ export default {
       },
       formLabelWidth: '120px',
       cameraList: [],
+      queryMeassages: [],
       checked: false,
       uploadReady: true
     }
@@ -181,8 +182,10 @@ export default {
               'Content-Type': 'application/json'
             }
           }
-          this.formData.name = `${this.formData.name}-${new Date().getTime()}`
-          axios.post(URL, this.formData, cameraConfig).then(
+          let newData = JSON.stringify(this.formData)
+          let data1 = JSON.parse(newData)
+          data1.name = data1.name + `-${new Date().getTime()}`
+          axios.post(URL, data1, cameraConfig).then(
             response => {
               this.getCameras()
               this.$root.$emit('updateCamera', this.cameraList)
@@ -262,12 +265,28 @@ export default {
             this.cameraList = response.data
             this.$root.$emit('updateCamera', this.cameraList)
             for (let i = 0; i <= this.cameraList.length; i++) {
-              this.cameraList[i]['stramedUrl'] = `http://localhost:9997/v1/monitor/cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
+              this.cameraList[i]['stramedUrl'] = baseUrl.baseUrl + `cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
             }
           }
         })
         .catch(error => {
           this.errorMessage = error.message
+        })
+    },
+    // Query Messages
+    getMessages () {
+      const URL = baseUrl.baseUrl + 'messages'
+      axios.get(URL)
+        .then(response => {
+          this.queryMeassages = response.data
+          this.$root.$emit('updateMessages', this.queryMeassages)
+        })
+        .catch(error => {
+          this.errorMessage = error.message
+          this.$notify.error({
+            title: 'Error',
+            message: 'Error In Getting Messages'
+          })
         })
     },
     // Delete Camera
@@ -277,6 +296,7 @@ export default {
         .then(response => {
           if (response.status === 200) {
             this.getCameras()
+            this.getMessages()
           }
         })
         .catch(error => {

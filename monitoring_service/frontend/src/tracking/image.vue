@@ -84,7 +84,7 @@ export default {
 <style scoped lang="less">
 .video-cards{
     width: 100%;
-    height: 380px;
+    height: 500px;
 }
 .camera-details-con {
     display: flex;

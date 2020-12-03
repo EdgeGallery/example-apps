@@ -34,11 +34,14 @@
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
           <span @click="addVideoEnable()">
-            Add Video
+            Upload Video
           </span>
         </el-breadcrumb-item>
         <el-breadcrumb-item>
-          <span @click="addCameraEnable()">
+          <span
+            @click="addCameraEnable()"
+            class="highlight"
+          >
             Add Camera
           </span>
         </el-breadcrumb-item>

@@ -38,8 +38,9 @@ app.get('/', function(req, res) {
 })
 
 app.get('/persons', function(req, res)  {
+  let host = req.hostname
   deleteFiles();
-  axios.get('http://127.0.0.1:9997/v1/monitor/persons')
+  axios.get('http://'+host+':32115/v1/monitor/persons')
   .then(function (response) {
     if(res.statusCode == 200) {
       fs.readdir('./public', (err, files) => {
@@ -49,7 +50,7 @@ app.get('/persons', function(req, res)  {
           let per = {
             id: index,
             name: file,
-            file: `http://localhost:${port}/static/${file}`
+            file: `http://${host}:32117/static/${file}`
           }
           personData.push(per);
         });
@@ -110,7 +111,7 @@ async function deleteFiles () {
 }
 
 const server = app.listen(port, '0.0.0.0', () => {
-  console.log(`Server is running on http://localhost:${port}`)
+  console.log(`Server is running on http://monitoring-proxy-service:${port}`)
 })
 
-const io = socket(server);
+const io = socket(server)
