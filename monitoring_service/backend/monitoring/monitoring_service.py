@@ -65,6 +65,12 @@ class VideoCamera(object):
         success, image = self.video.read()
         return success, image
 
+    def reset_frame(self):
+        """
+        获取实时视频流
+        """
+        self.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
 
 class VideoFile(object):
     """
@@ -191,26 +197,57 @@ def thread_function(frame, camera_name):
         send_notification_msg(camera_name, name)
 
 
-def video(video_capture, camera_name):
+def camera_video(video_capture, camera_name):
     """
     人脸识别
     """
+    app.logger.info("camera video")
     process_this_frame = 0
     while True:
         success, frame = video_capture.get_frame()
         if not success:
+            break
+        if process_this_frame == 0:
+            x = threading.Thread(target=thread_function, args=(frame, camera_name,))
+            x.start()
+            x.join(3)
+
+        process_this_frame = process_this_frame + 1
+        if process_this_frame == 42:
+            process_this_frame = 0
+
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
+
+
+def video(video_capture, camera_name):
+    """
+    人脸识别
+    """
+    app.logger.info("local video")
+    process_this_frame = 0
+    count = 0
+    while True:
+        success, frame = video_capture.get_frame()
+        if count == 5:
+            break
+        if not success:
             video_capture.reset_frame()
+            count = count + 1
             continue
         if process_this_frame == 0:
             x = threading.Thread(target=thread_function, args=(frame, camera_name,))
             x.start()
+            x.join(3)
 
+        count = 0
         process_this_frame = process_this_frame + 1
-        if process_this_frame == 10:
+        if process_this_frame == 42:
             process_this_frame = 0
 
         ret, jpeg = cv2.imencode('.jpg', frame)
-        time.sleep(.07)
+        time.sleep(.01)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
 
@@ -242,17 +279,22 @@ def add_camera():
     return Response("success")
 
 
-@app.route('/v1/monitor/cameras/<name>/<rtspurl>/<location>', methods=['GET'])
-def get_camera(name, rtspurl, location):
+@app.route('/v1/monitor/cameras/<camera_name>', methods=['GET'])
+def get_camera(camera_name):
     """
     通过摄像头人脸识别
     """
+    camera_info = {}
     app.logger.info(constants.received_message + request.remote_addr + constants.operation + request.method + "]" +
                     constants.resource + request.url + "]")
-    if len(name) >= 64 or len(location) >= 64:
+    if len(camera_name) >= 64:
         raise ValidationError(constants.person_maxsize)
 
-    camera_info = {"name": name, "rtspurl": rtspurl, "location": location}
+    for camera_msg in listOfCameras:
+        if camera_name == camera_msg["name"]:
+            camera_info = camera_msg
+            break
+
     if "mp4" in camera_info["rtspurl"]:
         video_file = VideoFile(camera_info["rtspurl"])
         video_dict = {camera_info["name"]: video_file}
@@ -263,7 +305,7 @@ def get_camera(name, rtspurl, location):
         video_file = VideoCamera(camera_info["rtspurl"])
         video_dict = {camera_info["name"]: video_file}
         listOfVideos.append(video_dict)
-        return Response(video(video_file, camera_info["name"]), mimetype='multipart/x-mixed-replace; boundary=frame')
+        return Response(camera_video(video_file, camera_info["name"]), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/v1/monitor/cameras/<camera_name>', methods=['DELETE'])
@@ -435,6 +477,41 @@ def get_access_token():
     data = result.json()
     access_token = data["access_token"]
     return access_token
+
+
+@app.route('/v1/mobile/monitor/persons', methods=['POST'])
+def upload_image():
+    """
+    图像录入
+    """
+    app.logger.info(constants.received_message + request.remote_addr + constants.operation + request.method + "]" +
+                    constants.resource + request.url + "]")
+    person_info = request.json
+    if 'file' not in request.files:
+        raise IOError('No file')
+    url = constants.recognition_url + "/v1/face-recognition/upload"
+
+    files = request.files.getlist("file")
+    for file in files:
+        if allowed_file(file.filename):
+            file.filename = person_info["person_name"]
+            file.save(os.path.join(app.config['UPLOAD_PATH'], file.filename))
+        else:
+            raise IOError('picture format is error')
+
+    upload_files = []
+    result = ""
+    for file in files:
+        upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
+
+        if constants.access_token_enabled and constants.ssl_enabled:
+            access_token = get_access_token()
+            headers = {'Content-Type': 'application/json', 'Authorization': access_token}
+            result = requests.post(url, files=upload_files, headers=headers, verify=config.ssl_cacertpath)
+        else:
+            result = requests.post(url, files=upload_files)
+
+    return result.text
 
 
 def start_server(handler):
