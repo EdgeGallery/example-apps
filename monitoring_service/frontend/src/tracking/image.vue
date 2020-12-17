@@ -16,24 +16,19 @@
 <template>
   <el-card :body-style="{ padding: '0px' }">
     <div class="video-cards">
+      <img
+        :id="data.name"
+        class="video-cards"
+        :src="data.stramedUrl"
+        v-if="data.stramedUrl.indexof('.mp4')>-1"
+      >
       <video-player
         class="video-player vjs-custom-skin"
         ref="videoPlayer"
-        v-if="!local"
+        v-if="data.stramedUrl.indexof('.mp4')<0"
         :playsinline="true"
         :options="playerOptions"
       />
-      <video
-        controls
-        height="100%"
-        width="100%"
-        v-if="local"
-      >
-        <source
-          src="../assets/test.mp4"
-          type="video/mp4"
-        >
-      </video>
     </div>
 
     <div style="padding: 14px;">
