@@ -75,7 +75,7 @@
           />
         </el-form-item>
         <el-form-item
-          label="RTSP/VIDEO"
+          label="RTMP/VIDEO"
           prop="rtspurl"
           :label-width="formLabelWidth"
         >

@@ -45,7 +45,7 @@ export default {
       cameracolumns: [
         { prop: 'name', label: 'Name', width: 140 },
         { prop: 'location', label: 'Location', width: 140 },
-        { prop: 'rtspurl', label: 'RTSPurl', minWidth: 180 }
+        { prop: 'rtspurl', label: 'RTMPurl', minWidth: 180 }
       ]
     }
   }
