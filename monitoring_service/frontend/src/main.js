@@ -23,9 +23,11 @@ import '../src/assets/css/common.css'
 import '../src/assets/css/override.css'
 import locale from 'element-ui/lib/locale/lang/en'
 import i18n from './locales/i18n.js'
-import 'area-linkage-vue/dist/index.css'
-import AreaLinkageVue from 'area-linkage-vue'
-Vue.use(AreaLinkageVue)
+import 'videojs-flash'
+import VideoPlayer from 'vue-video-player'
+require('video.js/dist/video-js.css')
+require('vue-video-player/src/custom-theme.css')
+Vue.use(VideoPlayer)
 Vue.use(ElementUI, { locale })
 Vue.config.productionTip = false
 

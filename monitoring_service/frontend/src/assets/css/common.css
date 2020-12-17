@@ -160,3 +160,9 @@ body .el-table th.gutter{
     background-color: transparent;
     border: none !important;
 }
+
+
+.video-player,.vjs-custom-skin > .video-js{
+  height:100%;
+}
+
