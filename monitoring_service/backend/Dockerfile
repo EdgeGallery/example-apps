@@ -27,6 +27,7 @@ RUN mkdir -p /usr/app
 RUN mkdir -p /usr/app/bin
 RUN mkdir -p /usr/app/monitoring
 RUN mkdir -p /usr/app/test/resources
+RUN mkdir -p /usr/app/images
 
 # Set the home directory to our app user's home.
 ENV APP_HOME=/usr/app
