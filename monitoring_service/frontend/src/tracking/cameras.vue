@@ -272,6 +272,9 @@ export default {
               this.cameraList.push(obj)
             })
             this.$root.$emit('updateCamera', this.cameraList)
+            for (let i = 0; i <= this.cameraList.length; i++) {
+              this.cameraList[i]['stramedUrl'] = baseUrl.baseUrl + `cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
+            }
           }
         })
         .catch(error => {
