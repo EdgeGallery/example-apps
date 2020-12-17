@@ -262,11 +262,16 @@ export default {
       axios.get(URL)
         .then(response => {
           if (response.status === 200) {
-            this.cameraList = response.data
+            response.data.forEach(el => {
+              let obj = {
+                name: el.name,
+                location: el.location,
+                type: 'rtmp/hls',
+                src: el.rtspurl
+              }
+              this.cameraList.push(obj)
+            })
             this.$root.$emit('updateCamera', this.cameraList)
-            for (let i = 0; i <= this.cameraList.length; i++) {
-              this.cameraList[i]['stramedUrl'] = baseUrl.baseUrl + `cameras/${this.cameraList[i].name}/${this.cameraList[i].rtspurl}/${this.cameraList[i].location}`
-            }
           }
         })
         .catch(error => {

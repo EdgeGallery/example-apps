@@ -9,13 +9,9 @@
     "eslint": "eslint -f checkstyle --ext .js,.vue src -o eslint_result.xml"
   },
   "dependencies": {
-    "area-data": "^5.0.6",
-    "area-data-vue": "^1.0.9",
-    "area-linkage-vue": "^5.1.2",
     "axios": "^0.19.0",
     "colorette": "^1.2.0",
     "core-js": "^3.6.2",
-    "echarts": "^4.2.1",
     "el-search-table-pagination": "^0.4.31",
     "el-table-pagination": "^0.4.38",
     "element-ui": "^2.13.2",
@@ -26,12 +22,12 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.1",
     "vue": "^2.6.11",
-    "vue-amap": "^0.5.10",
     "vue-core-video-player": "^0.1.9",
     "vue-generate-component": "^2.1.1",
     "vue-i18n": "^8.17.7",
     "vue-router": "^3.2.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "vue-video-player": "^5.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.4",
