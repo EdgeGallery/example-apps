@@ -39,18 +39,20 @@ app.get('/', function(req, res) {
 
 app.get('/persons', function(req, res)  {
   let host = req.hostname
+  let port1 = req.port-1
+  let port2 = req.port+1
   deleteFiles();
-  axios.get('http://'+host+':32115/v1/monitor/persons')
+  axios.get('http://'+host+':'+port1+'/v1/monitor/persons')
   .then(function (response) {
     if(res.statusCode == 200) {
       fs.readdir('./public', (err, files) => {
-        personData = [];
+        let personData = [];
         files.map( (file, index) => {
           console.log(file);
           let per = {
             id: index,
             name: file,
-            file: `http://${host}:32117/static/${file}`
+            file: 'http://'+ host +':'+port2+'/static/'+ file
           }
           personData.push(per);
         });
@@ -101,10 +103,9 @@ const storage = multer.diskStorage({
 
 async function deleteFiles () {
   fs.readdir('./public', (err, files) => {
-    personData = [];
     files.map( (file, index) => {
-      fs.unlink('./public/'+file, function(err) {
-        if(err) console.log(err.message);
+      fs.unlink('./public/'+file, function(error) {
+        if(error) console.log(error.message);
       });
     });
   });
