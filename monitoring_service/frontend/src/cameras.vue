@@ -266,10 +266,11 @@ export default {
             response.data.forEach(el => {
               let obj = {
                 name: el.name,
-                type: el.rtspurl.indexOf('mp4') > -1 ? 'video/mp4' : 'rtmp/hls',
                 location: el.location,
-                src: el.rtspurl.indexOf('mp4') > -1 ? baseUrl.baseUrl + `cameras/${el.name}` : el.rtspurl,
-                rtspurl: el.rtspurl
+                type: 'rtmp/hls',
+                src: el.rtspurl,
+                rtspurl: el.rtspurl,
+                stramedUrl: baseUrl.baseUrl + `cameras/${el.name}`
               }
               this.cameraList.push(obj)
             })
