@@ -19,18 +19,17 @@
       <img
         :id="data.name"
         class="video-cards"
-        :src="data.stramedUrl"
-        v-if="data.stramedUrl.indexof('.mp4')>-1"
+        :src="data.src"
+        v-if="data.rtspurl.indexOf('mp4')>-1"
       >
       <video-player
         class="video-player vjs-custom-skin"
         ref="videoPlayer"
-        v-if="data.stramedUrl.indexof('.mp4')<0"
         :playsinline="true"
         :options="playerOptions"
+        v-if="data.rtspurl.indexOf('mp4')<0"
       />
     </div>
-
     <div style="padding: 14px;">
       <div class="camera-details-con">
         <div class="bottom clearfix cd-text">
@@ -79,10 +78,7 @@ export default {
         techOrder: ['flash', 'html5'],
         hls: { withCredentials: false },
         html5: { hls: { withCredentials: false } },
-        sources: [{
-          type: 'rtmp/hls',
-          src: 'rtmp://58.200.131.2:1935/livetv/hunantv'
-        }],
+        sources: [],
         poster: '',
         width: document.documentElement.clientWidth,
         notSupportedMessage: '此视频暂无法播放，请稍后再试',
@@ -117,7 +113,7 @@ export default {
     }
   },
   mounted () {
-
+    this.playerOptions.sources.push(this.data)
   }
 }
 </script>
