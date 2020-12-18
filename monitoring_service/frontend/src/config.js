@@ -17,7 +17,7 @@
 var host = window.location.hostname
 var port = window.location.port
 var port1 = port - 1
-var port2 = port + 1
+var port2 = parseFloat(port) + 1
 export default {
 
   baseUrl: 'http://' + host + ':' + port1 + '/v1/monitor/',
