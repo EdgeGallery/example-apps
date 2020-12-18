@@ -28,8 +28,10 @@ const path = require('path');
 const helpers = require('./helpers');
 const socket = require("socket.io");
 
+const env=process.env
 const port = 5000;
 
+console.log(env)
 app.use('/static', express.static(path.join(__dirname, './public')));
 app.use(bodyParser.json());
 
@@ -39,23 +41,25 @@ app.get('/', function(req, res) {
 
 app.get('/persons', function(req, res)  {
   let host = req.hostname
-  let port1 = parseFloat(req.port)-1
-  let port2 = parseFloat(req.port)+1
+  let port1 = env.EXPOSE_PORT
+  let port2 = parseFloat(port1) - 2
   deleteFiles();
-  axios.get('http://'+host+':'+port1+'/v1/monitor/persons')
+  axios.get('http://'+host+':'+port2+'/v1/monitor/persons')
   .then(function (response) {
     if(res.statusCode == 200) {
       fs.readdir('./public', (err, files) => {
         let personData = [];
-        files.map( (file, index) => {
-          console.log(file);
-          let per = {
-            id: index,
-            name: file,
-            file: 'http://'+ host +':'+port2+'/static/'+ file
-          }
-          personData.push(per);
-        });
+        if(files){
+          files.map( (file, index) => {
+            console.log(file);
+            let per = {
+              id: index,
+              name: file,
+              file: 'http://'+host+':'+port1+'/static/'+file
+            }
+            personData.push(per);
+          });
+        }
         res.send(JSON.stringify(personData));
       });
    }
@@ -103,11 +107,13 @@ const storage = multer.diskStorage({
 
 async function deleteFiles () {
   fs.readdir('./public', (err, files) => {
-    files.map( (file, index) => {
-      fs.unlink('./public/'+file, function(error) {
-        if(error) console.log(error.message);
+    if(files){
+      files.map( (file, index) => {
+        fs.unlink('./public/'+file, function(error) {
+          if(error) console.log(error.message);
+        });
       });
-    });
+    }
   });
 }
 
