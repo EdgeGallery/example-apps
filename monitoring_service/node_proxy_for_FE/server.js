@@ -39,8 +39,8 @@ app.get('/', function(req, res) {
 
 app.get('/persons', function(req, res)  {
   let host = req.hostname
-  let port1 = req.port-1
-  let port2 = req.port+1
+  let port1 = parseFloat(req.port)-1
+  let port2 = parseFloat(req.port)+1
   deleteFiles();
   axios.get('http://'+host+':'+port1+'/v1/monitor/persons')
   .then(function (response) {
