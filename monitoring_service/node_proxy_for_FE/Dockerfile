@@ -48,6 +48,7 @@ COPY . .
 RUN chmod 750 $APP_HOME &&\
     chmod -R 550 $APP_HOME/bin &&\
     mkdir -p -m 750 $APP_HOME/log &&\
+    mkdir -p -m 750 $APP_HOME/public &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME
 
 # Install requirements
