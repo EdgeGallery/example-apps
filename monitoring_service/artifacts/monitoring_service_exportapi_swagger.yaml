@@ -1,0 +1,163 @@
+swagger: "2.0"
+info:
+  description: "监控服务，Edge Gallery社区样例服务，对外提供在监控系统内追踪人员活动情况的能力。"
+  version: "1.0.0"
+  title: "监控服务"
+
+basePath: "/v1/monitoring"
+tags:
+- name: "monitoring"
+  description: "监控服务"
+
+schemes:
+- "https"
+paths:
+  /persons:
+    post:
+      tags:
+      - "monitoring"
+      summary: "添加人员"
+      description: "添加人员"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "file"
+        in: "formData"
+        description: "需要添加的人员图片，文件名以人员名称命名"
+        required: false
+        type: "file"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "添加人员成功"
+          schema:
+            $ref: "#/definitions/Person"
+    get:
+      tags:
+      - "monitoring"
+      summary: "获取人员列表"
+      description: "获取人员列表"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "查询人员成功"
+          schema:
+            $ref: "#/definitions/Persons"
+  /persons/{personname}:
+    delete:
+      tags:
+      - "monitoring"
+      summary: "删除人员信息"
+      description: "删除人员信息"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        type: "string"
+        name: "personname"
+        description: "人员名"
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "删除人员成功"
+  /messages:
+    post:
+      tags:
+      - "monitoring"
+      summary: "查询人员活动信息"
+      description: "查询人员活动信息"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "查询人员活动信息请求体"
+        required: true
+        schema:
+          type: "array"
+          description: "人员名单"
+          items:
+            type: "string"
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "查询人员活动信息成功"
+          schema:
+            $ref: "#/definitions/PersonTraceInfos"
+  /persons/{personname}/messages:
+    post:
+      tags:
+      - "monitoring"
+      summary: "查询单个人员活动信息"
+      description: "查询单个人员活动信息"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        type: "string"
+        name: "personname"
+        description: "人员名称"
+        required: true
+      responses:
+        "405":
+          description: "Invalid input"
+        "200":
+          description: "查询人员活动信息成功"
+          schema:
+            $ref: "#/definitions/PersonTraceInfo"
+definitions:
+  Person:
+    type: "object"
+    properties:
+      name: 
+        type: "string"
+        description: "人员名称"
+      image: 
+        type: "string"
+        description: "人员图片的URI"
+  Persons:
+    type: "array"
+    items:
+      $ref: "#/definitions/Person"
+  PersonTraceInfo:
+      type: "object"
+      properties:
+        prsonName: 
+          type: "string"
+          description: "人员名称"
+        traces: 
+          type: "array"
+          description: "活动信息列表"
+          items:
+            type: "object"
+            properties:
+              traceId: 
+                type: "integer"
+                description: "活动信息Id"
+              Location: 
+                type: "string"
+                description: "活动的地理位置，即出现在哪个位置的摄像头前"
+              time:
+                type: "string"
+                description: "活动时间"
+  PersonTraceInfos:
+    type: "array"
+    items:
+      $ref: "#/definitions/PersonTraceInfo"
