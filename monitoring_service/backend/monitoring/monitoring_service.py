@@ -351,6 +351,7 @@ def upload():
     """
     app.logger.info(constants.received_message + request.remote_addr + constants.operation + request.method + "]" +
                     constants.resource + request.url + "]")
+    person_info = request.values
     if 'file' not in request.files:
         raise IOError('No file')
     url = constants.recognition_url + "/v1/face-recognition/upload"
@@ -358,6 +359,10 @@ def upload():
     files = request.files.getlist("file")
     for file in files:
         if allowed_file(file.filename):
+            if person_info is not None and "person_name" in person_info:
+                file.filename = person_info["person_name"]
+                if ".jpg" not in file.filename:
+                    file.filename = file.filename + ".jpg"
             file.save(os.path.join(app.config['UPLOAD_PATH'], file.filename))
         else:
             raise IOError('picture format is error')
@@ -477,41 +482,6 @@ def get_access_token():
     data = result.json()
     access_token = data["access_token"]
     return access_token
-
-
-@app.route('/v1/mobile/monitor/persons', methods=['POST'])
-def upload_image():
-    """
-    图像录入
-    """
-    app.logger.info(constants.received_message + request.remote_addr + constants.operation + request.method + "]" +
-                    constants.resource + request.url + "]")
-    person_info = request.json
-    if 'file' not in request.files:
-        raise IOError('No file')
-    url = constants.recognition_url + "/v1/face-recognition/upload"
-
-    files = request.files.getlist("file")
-    for file in files:
-        if allowed_file(file.filename):
-            file.filename = person_info["person_name"]
-            file.save(os.path.join(app.config['UPLOAD_PATH'], file.filename))
-        else:
-            raise IOError('picture format is error')
-
-    upload_files = []
-    result = ""
-    for file in files:
-        upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
-
-        if constants.access_token_enabled and constants.ssl_enabled:
-            access_token = get_access_token()
-            headers = {'Content-Type': 'application/json', 'Authorization': access_token}
-            result = requests.post(url, files=upload_files, headers=headers, verify=config.ssl_cacertpath)
-        else:
-            result = requests.post(url, files=upload_files)
-
-    return result.text
 
 
 def start_server(handler):
