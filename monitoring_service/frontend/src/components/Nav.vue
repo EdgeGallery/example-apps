@@ -15,37 +15,57 @@
   -->
 
 <template>
-  <div class="navgation">
-    <div style="width: 50%;">
-      <div
-        class="logo lt"
-        @click="jumpLogoTo"
-      >
-        <img
-          src="../assets/images/logo.png"
-          alt=""
+  <div>
+    <div class="navgation display-none">
+      <div style="width: 50%;">
+        <div
+          class="logo lt"
+          @click="jumpLogoTo"
         >
+          <img
+            src="../assets/images/logo.png"
+            alt=""
+          >
+        </div>
+        <div class="logo-header">
+          <span>Monitoring Service</span>
+        </div>
       </div>
-      <div class="logo-header">
-        <span>Monitoring Service</span>
+      <div class="AddDetais">
+        <el-breadcrumb separator="/">
+          <el-breadcrumb-item>
+            <span @click="addVideoEnable()">
+              Upload Video
+            </span>
+          </el-breadcrumb-item>
+          <el-breadcrumb-item>
+            <span
+              @click="addCameraEnable()"
+              class="highlight"
+            >
+              Add Camera
+            </span>
+          </el-breadcrumb-item>
+        </el-breadcrumb>
       </div>
     </div>
-    <div class="AddDetais">
-      <el-breadcrumb separator="/">
-        <el-breadcrumb-item>
-          <span @click="addVideoEnable()">
-            Upload Video
-          </span>
-        </el-breadcrumb-item>
-        <el-breadcrumb-item>
-          <span
-            @click="addCameraEnable()"
-            class="highlight"
+    <!--mobileView Header-->
+    <div class="mobile-navgation display-block">
+      <div>
+        <div
+          class="logo lt"
+          @click="jumpLogoTo"
+        >
+          <img
+            src="../assets/images/logo_no_letter.png"
+            alt=""
           >
-            Add Camera
-          </span>
-        </el-breadcrumb-item>
-      </el-breadcrumb>
+        </div>
+        <div class="logo-header">
+          <span>Monitoring Service</span>
+          <i class="el-icon-user-solid" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -120,6 +140,48 @@ export default {
     width:50%;
     justify-content: flex-end;
     align-items: center
+  }
+}
+@media(max-width:767.98px) {
+  .display-none {
+    display: none;
+  }
+  .display-block {
+    display: block
+  }
+  .mobile-navgation{
+  background: #128cbd;
+  box-shadow: none;
+  height: 65px;
+  top: 0px;
+  width: 100%;
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  .logo{
+      height: 65px;
+      width: 50px;
+      line-height: 65px;
+      margin-left: 10px;
+    img{
+      position: relative;
+      top: 10px;
+      width: 40px;
+      cursor: pointer;
+    }
+  }
+  .logo-header{
+    font-size: 21px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 65px;
+    width: 290px;
+  }
   }
 }
 </style>

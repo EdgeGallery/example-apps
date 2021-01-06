@@ -14,8 +14,8 @@
  *  limitations under the License.
  */
 <template>
-  <div class="top-container">
-    <div class="width-47">
+  <div class="top-container xs-height-100">
+    <div class="width-47 display-none">
       <el-tabs type="border-card">
         <el-tab-pane
           style="height:300px; overflow: auto;"
@@ -94,7 +94,85 @@
         >
       </el-dialog>
     </div>
-    <div class="width-47">
+    <!--******************MobileView************************-->
+    <div
+      class="web-display-none mobile-display-block xs-height-100"
+      style="width:100%"
+    >
+      <el-tabs type="border-card">
+        <el-tab-pane
+          style="overflow: auto;"
+          class="tabs-border"
+        >
+          <span slot="label"><i class="el-icon-user" /> Persons</span>
+          <h3 class="h3-lable">
+            PersonName
+          </h3>
+          <el-input
+            placeholder="Please Add PersonName"
+            v-model="person_name"
+          />
+          <h3 class="h3-lable">
+            AddPicture
+          </h3>
+          <div class="file-input-wrapper">
+            <button class="btn-file-input">
+              Click to add Picture
+            </button>
+            <input
+              type="file"
+              ref="personPic"
+              accept="jpg"
+              @change="referenceUpload($event)"
+              v-if="uploadReady"
+              autocomplete="off"
+              aria-label="File browser example"
+            >
+          </div>
+          <span id="img_text" />
+          <el-button
+            style="width: 50%; margin-left: 25%; margin-top:40px;"
+            size="small"
+            type="success"
+            @click="uploadPerson()"
+          >
+            Submit
+          </el-button>
+          <h3 class="xs-list">
+            PersonsList
+          </h3>
+          <ul
+            class="el-upload-list el-upload-list--picture"
+            v-for="(item, index) in personsList"
+            :key="index"
+          >
+            <li
+              tabindex="0"
+              class="el-upload-list__item is-success"
+            >
+              <img
+                :src="item.file"
+                alt=""
+                class="el-upload-list__item-thumbnail"
+              ><a class="el-upload-list__item-name"><i class="el-icon-document" />{{ item.name }}
+              </a><label class="el-upload-list__item-status-label"><i class="el-icon-upload-success el-icon-check" /></label><i
+                class="el-icon-close"
+                @click="beforeDeletePerson(item.name)"
+              /><i class="el-icon-close-tip">按 delete 键可删除</i>
+            </li>
+          </ul>
+        </el-tab-pane>
+      </el-tabs>
+      <el-dialog :visible.sync="dialogVisible">
+        <img
+          width="100%"
+          :src="dialogImageUrl"
+          alt=""
+        >
+      </el-dialog>
+    </div>
+    <!--**************************************-->
+    <div class="width-47 display-none">
       <el-tabs
         type="border-card"
         @tab-click="handleClick"
@@ -138,8 +216,10 @@ export default {
   data () {
     return {
     // showUpload: true,
+      person_name: '',
       videos: '',
       dialogImageUrl: '',
+      pictureFile: '',
       baseURL: baseUrl.baseUrl + 'persons',
       dialogVisible: false,
       disabled: false,
@@ -220,13 +300,57 @@ export default {
           this.errorMessage = error.message
         })
     },
-    // Clear upload
+    // Mobile Upload
+    // Check the picture file size
+    referenceUpload (e) {
+      if (e.currentTarget.files[0].size > 1024 * 1024 * 100) {
+        alert('File too big (> 100MB) please make sure video file should be lessThen 100mb')
+        this.clearUpload()
+      } else {
+        this.pictureFile = e.currentTarget.files[0]
+      }
+    },
+    // Clear upload for Mobile App
     clearUpload () {
       this.uploadReady = false
       this.$nextTick(() => {
         this.uploadReady = true
       })
     },
+    // Upload person for Mobile APP
+    uploadPerson () {
+      const URL = baseUrl.baseUrl + 'persons'
+      let data = new FormData()
+      data.append('person_name', this.person_name)
+      data.append('file', this.pictureFile)
+
+      let config = {
+        header: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      axios.post(URL, data, config).then(
+        response => {
+          this.clearUpload()
+          this.person_name = ''
+          this.getPersons()
+          this.$notify({
+            title: 'Success',
+            message: 'Person added successfully',
+            type: 'success'
+          })
+        }
+      )
+        .catch(error => {
+          this.errorMessage = error.message
+          this.$notify.error({
+            title: 'Error',
+            message: 'Error in Upload Picture'
+          })
+          this.clearUpload()
+        })
+    },
+
     // view person image
     handlePictureCardPreview (file) {
       this.dialogImageUrl = file
@@ -348,5 +472,69 @@ export default {
 .user-icon-prop{
   font-size: 40px;
   cursor: pointer;
+}
+.web-display-none{
+  display: none;
+}
+@media(max-width:767.98px) {
+  .display-none {
+    display: none;
+  }
+  .mobile-display-block {
+    display: block
+  }
+  .h3-lable{
+    padding: 1%;
+    font-size: 17px;
+  }
+  .xs-height-100{
+    height: 100%;
+  }
+  .xs-list{
+    text-align: left;
+    margin-top: 30px;
+  }
+  .xs-fileupload{
+    width: 97%;
+    background: #409eff;
+    height: 30px;
+    color: #fff;
+
+    border-color: #409eff;
+    border-radius: 4px;
+    padding-top: 7px;
+    border: 1px solid #dcdfe6;
+    padding-left: 8px;
+  }
+  .pad-lef{
+    padding-left: 10px;
+  }
+  .file-input-wrapper {
+    height: 30px;
+    background-color: #fff;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+}
+.file-input-wrapper>input[type="file"] {
+  font-size: 40px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-input-wrapper>.btn-file-input {
+  width: 100%;
+  background-color: #409eff;
+  border-radius: 4px;
+  color: #fff;
+  display: inline-block;
+  height: 40px;
+  margin: 0 0 0 -1px;
+  cursor: pointer;
+  border: 1px solid gainsboro;
+}
 }
 </style>

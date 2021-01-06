@@ -58,4 +58,9 @@ export default {
   overflow: auto;
   // opacity: 0.85;
 }
+@media(max-width:767.98px) {
+  .track-container{
+    background: none
+  }
+}
 </style>
