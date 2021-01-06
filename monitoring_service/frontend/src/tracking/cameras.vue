@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 <template>
-  <div class="camera-display">
+  <div class="camera-display display-none">
     <!--add video-->
     <el-dialog
       title="Add video"
@@ -345,5 +345,9 @@ export default {
   padding: 1%;
   border: 1px solid #9e9e9e33;
 }
-
+@media(max-width:767.98px) {
+  .display-none {
+    display: none;
+  }
+}
 </style>

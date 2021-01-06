@@ -112,3 +112,42 @@ background-color:transparent;
   -webkit-box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important;
           box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important
 }
+@media(max-width:767.98px) {
+  .el-upload--picture-card{
+    width: 93px !important;
+    height: 90px !important;
+    border:1px dashed #212325
+  }
+  .el-upload--picture-card i {
+    font-size: 28px;
+    color: #8c939d;
+    position: relative;
+    top: -20px;
+}
+.el-upload-list--picture-card .el-upload-list__item {
+  width: 96px;
+  height: 90px;
+}
+.el-tabs--border-card{
+  box-shadow: none !important;
+}
+.el-tabs--border-card>.el-tabs__header{
+  /* border-bottom: 1px solid #14518e6e */
+  border: none;
+}
+.el-upload {
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  outline: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 1%;
+}
+.el-message-box {
+  width: 330px;
+}
+.el-message-box__btns{
+  text-align: center;
+}
+}
