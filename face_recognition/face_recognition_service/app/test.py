@@ -5,7 +5,7 @@
 import requests
 
 # 录入
-host = "http://119.8.125.174:32111"
+host = "http://face-recognition:32111"
 # url = host+"/v1/face-recognition/upload"
 #
 # path_upload = '../test/biden.jpg'
