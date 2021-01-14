@@ -22,13 +22,17 @@
         :src="data.src"
         v-if="data.rtspurl.indexOf('mp4')>-1"
       >
-      <video-player
+      <div
         class="video-player vjs-custom-skin"
-        ref="videoPlayer"
-        :playsinline="true"
-        :options="playerOptions"
         v-if="data.rtspurl.indexOf('mp4')<0"
-      />
+      >
+        <video
+          muted
+          id="videoElement"
+          width="100%"
+          height="100%"
+        />
+      </div>
     </div>
     <div style="padding: 14px;">
       <div class="camera-details-con">
@@ -47,6 +51,7 @@
 </template>
 
 <script>
+import flvjs from 'flv.js'
 export default {
   name: 'Camerapannel',
   props: {
@@ -63,32 +68,7 @@ export default {
   },
   data () {
     return {
-      value: 'I am the child.',
-      isCameraPanel: false,
-      local: false,
-      // 视频播放
-      playerOptions: {
-        playbackRates: [0.7, 1.0, 1.5, 2.0],
-        autoplay: true,
-        muted: false,
-        loop: false,
-        preload: 'auto',
-        language: 'zh-CN',
-        aspectRatio: '16:9',
-        techOrder: ['flash', 'html5'],
-        hls: { withCredentials: false },
-        html5: { hls: { withCredentials: false } },
-        sources: [],
-        poster: '',
-        width: document.documentElement.clientWidth,
-        notSupportedMessage: '此视频暂无法播放，请稍后再试',
-        controlBar: {
-          timeDivider: true,
-          durationDisplay: true,
-          remainingTimeDisplay: false,
-          fullscreenToggle: true
-        }
-      }
+      flvPlayer: null
     }
   },
   methods: {
@@ -113,7 +93,29 @@ export default {
     }
   },
   mounted () {
-    this.playerOptions.sources.push(this.data)
+    if (flvjs.isSupported()) {
+      var videoElement = document.getElementById('videoElement')
+      this.flvPlayer = flvjs.createPlayer({
+        type: 'flv',
+        isLive: true,
+        url: this.data.rtspurl
+      }, {
+        enableWorker: false,
+        enableStashBuffer: false,
+        isLive: true,
+        lazyLoad: false,
+        stashInitialSize: 0,
+        autoCleanupSourceBuffer: true
+      })
+      this.flvPlayer.attachMediaElement(videoElement)
+      this.flvPlayer.load()
+      let playPromise = this.flvPlayer.play()
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          this.flvPlayer.play()
+        }).catch((e) => { console.log(e) })
+      }
+    }
   }
 }
 </script>
