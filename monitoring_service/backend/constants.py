@@ -15,12 +15,13 @@
 #
 
 import config
-import os
 
 # [Constants]
+httpUrl = "http://"
+httpsUrl = "https://"
 recognition_url = config.api_gateway
-mep_agent_url = "http://" + config.mep_agent
-frontend_url = "http://" + config.fe_service
+mep_agent_url = config.mep_agent
+frontend_url = httpUrl + config.fe_service
 face_position = "Face position"
 received_message = "Received message from ClientIP ["
 operation = "] Operation ["
@@ -28,6 +29,7 @@ resource = " Resource ["
 person_maxsize = "length of the person name is larger than max size"
 contentType = "application/json"
 frontOfCamera = " has appeared in front of camera "
+face_recognition_service = "facerecognition_service"
 WAIT_SECONDS = 1
 PERSON_TIMEOUT_SECONDS = 15
 access_token_enabled = False

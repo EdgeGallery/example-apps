@@ -21,7 +21,7 @@ from os import path
 from flask import Flask, Response, request, jsonify, send_from_directory
 import config
 import constants
-import restclient
+import factory
 import datetime
 import threading
 import json
@@ -45,8 +45,6 @@ listOfCameras = []
 listOfVideos = []
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
-listOfServices = ["facerecognition_service"]
-clientObjects = {}
 
 
 class VideoCamera(object):
@@ -192,9 +190,10 @@ def thread_function(frame, camera_name):
     # Convert the image from BGR color  to RGB color
     rgb_small_frame = small_frame[:, :, ::-1]
 
-    url = constants.recognition_url + "/v1/face-recognition/recognition"
     body = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
-    rest_client = get_object_by_service_name("facerecognition_service")
+    client = factory.Client()
+    rest_client = client.get_client_by_service_name(constants.face_recognition_service)
+    url = rest_client.get_endpoint() + "/v1/face-recognition/recognition"
     response = rest_client.post(url, body)
     data = json.loads(response).text
 
@@ -360,7 +359,6 @@ def upload():
     person_info = request.values
     if 'file' not in request.files:
         raise IOError('No file')
-    url = constants.recognition_url + "/v1/face-recognition/upload"
 
     files = request.files.getlist("file")
     for file in files:
@@ -377,7 +375,9 @@ def upload():
     response = ""
     for file in files:
         upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
-        rest_client = get_object_by_service_name("facerecognition_service")
+        client = factory.Client()
+        rest_client = client.get_client_by_service_name(constants.face_recognition_service)
+        url = rest_client.get_endpoint() + "/v1/face-recognition/upload"
         response = rest_client.post(url, files=upload_files)
     return response.text
 
@@ -420,9 +420,9 @@ def delete_person(person_name):
 
     person = person_name
     person_name = person_name[0:-4]
-    url = constants.recognition_url + "/v1/face-recognition/{0}".format(person_name)
-
-    rest_client = get_object_by_service_name("facerecognition_service")
+    client = factory.Client()
+    rest_client = client.get_client_by_service_name(constants.face_recognition_service)
+    url = rest_client.get_endpoint() + "/v1/face-recognition/{0}".format(person_name)
     response = rest_client.delete(url, data=person_name)
     if response:
         os.remove(app.config['UPLOAD_PATH'] + person)
@@ -466,35 +466,11 @@ def query_person(person_name):
     return Response("person name " + person_name + " doesn't exist")
 
 
-def get_service_endpoint(service):
-    url = config.mep_agent + "/mep-agent/v1/endpoint/{0}".format(service)
-    headers = {'Content-Type': constants.contentType}
-    if config.ssl_enabled:
-        result = requests.get(url, headers=headers, verify=config.ssl_cacertpath)
-    else:
-        result = requests.get(url, headers=headers)
-
-    # extracting data in json format
-    data = result.json()
-    url = data["url"]
-    return url
-
-
-def update_client_object():
-    for service in listOfServices:
-        endpoint = get_service_endpoint(service)
-        if "http" in endpoint or "https" in endpoint:
-            clientObjects[service] = restclient.RestClient()
-
-
-def get_object_by_service_name(service):
-    return clientObjects[service]
-
-
 def start_server(handler):
     logging.basicConfig(level=logging.INFO)
     app.logger.addHandler(handler)
-    update_client_object()
+    client = factory.Client()
+    client.update_client_object()
     if config.ssl_enabled:
         context = (config.ssl_certfilepath, config.ssl_keyfilepath)
         app.run(host=config.server_address, debug=True, ssl_context=context, threaded=True, port=config.server_port)
