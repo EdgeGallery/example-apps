@@ -21,7 +21,7 @@ from os import path
 from flask import Flask, Response, request, jsonify, send_from_directory
 import config
 import constants
-import factory
+import clientfactory
 import datetime
 import threading
 import json
@@ -191,7 +191,7 @@ def thread_function(frame, camera_name):
     rgb_small_frame = small_frame[:, :, ::-1]
 
     body = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
-    client = factory.Client()
+    client = clientfactory.Client()
     rest_client = client.get_client_by_service_name(constants.face_recognition_service)
     url = rest_client.get_endpoint() + "/v1/face-recognition/recognition"
     response = rest_client.post(url, body)
@@ -375,7 +375,7 @@ def upload():
     response = ""
     for file in files:
         upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
-        client = factory.Client()
+        client = clientfactory.Client()
         rest_client = client.get_client_by_service_name(constants.face_recognition_service)
         url = rest_client.get_endpoint() + "/v1/face-recognition/upload"
         response = rest_client.post(url, files=upload_files)
@@ -420,7 +420,7 @@ def delete_person(person_name):
 
     person = person_name
     person_name = person_name[0:-4]
-    client = factory.Client()
+    client = clientfactory.Client()
     rest_client = client.get_client_by_service_name(constants.face_recognition_service)
     url = rest_client.get_endpoint() + "/v1/face-recognition/{0}".format(person_name)
     response = rest_client.delete(url, data=person_name)
@@ -469,7 +469,7 @@ def query_person(person_name):
 def start_server(handler):
     logging.basicConfig(level=logging.INFO)
     app.logger.addHandler(handler)
-    client = factory.Client()
+    client = clientfactory.Client()
     client.update_client_object()
     if config.ssl_enabled:
         context = (config.ssl_certfilepath, config.ssl_keyfilepath)

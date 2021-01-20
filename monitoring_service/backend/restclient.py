@@ -15,18 +15,25 @@
 #
 
 import requests
-import constants
-import config
+import os
+
+httpUrl = "http://"
+httpsUrl = "https://"
+mep_agent_url = os.environ.get("MEP_AGENT", "edgegallery.org")
+ssl_enabled = False
+access_token_enabled = False
+contentType = "application/json"
+ssl_cacertpath = "/usr/app/ssl/ca.crt"
 
 
 def get_access_token():
-    url = constants.mep_agent_url + "/mep-agent/v1/token"
-    headers = {'Content-Type': constants.contentType}
-    if config.ssl_enabled:
-        url = constants.httpsUrl + url
-        response = requests.get(url, headers=headers, verify=config.ssl_cacertpath)
+    url = mep_agent_url + "/mep-agent/v1/token"
+    headers = {'Content-Type': contentType}
+    if ssl_enabled:
+        url = httpsUrl + url
+        response = requests.get(url, headers=headers, verify=ssl_cacertpath)
     else:
-        url = constants.httpUrl + url
+        url = httpUrl + url
         response = requests.get(url, headers=headers)
     # extracting data in json format
     data = response.json()
@@ -40,19 +47,19 @@ class RestClient:
         self.endpoint = endpoint
 
     def post(self, url, body=None, **kwargs):
-        if constants.access_token_enabled and constants.ssl_enabled:
+        if access_token_enabled and ssl_enabled:
             access_token = get_access_token()
-            headers = {'Content-Type': constants.contentType, 'Authorization': access_token}
-            response = requests.post(url, data=body, headers=headers, verify=config.ssl_cacertpath, **kwargs)
+            headers = {'Content-Type': contentType, 'Authorization': access_token}
+            response = requests.post(url, data=body, headers=headers, verify=ssl_cacertpath, **kwargs)
         else:
             response = requests.post(url, data=body, **kwargs)
         return response
 
     def delete(self, url, **kwargs):
-        if constants.access_token_enabled and constants.ssl_enabled:
+        if access_token_enabled and ssl_enabled:
             access_token = get_access_token()
-            headers = {'Content-Type': constants.contentType, 'Authorization': access_token}
-            response = requests.delete(url, headers=headers, verify=config.ssl_cacertpath, **kwargs)
+            headers = {'Content-Type': contentType, 'Authorization': access_token}
+            response = requests.delete(url, headers=headers, verify=ssl_cacertpath, **kwargs)
         else:
             response = requests.delete(url, **kwargs)
         return response

@@ -15,23 +15,22 @@
 #
 
 import requests
-import config
-import constants
 import restclient
 
-listOfServices = [constants.face_recognition_service]
+listOfServices = ["facerecognition_service"]
 clientObjects = {}
 
 
 def get_service_endpoint(service):
-    url = constants.mep_agent_url + "/mep-agent/v1/endpoint/{0}".format(service)
-    headers = {'Content-Type': constants.contentType}
-    if config.ssl_enabled:
-        url = constants.httpsUrl + url
-        response = requests.get(url, headers=headers, verify=config.ssl_cacertpath)
+    url = restclient.mep_agent_url + "/mep-agent/v1/endpoint/{0}".format(service)
+    headers = {'Content-Type': "application/json"}
+    if restclient.ssl_enabled:
+        url = restclient.httpsUrl + url
+        response = requests.get(url, headers=headers, verify=restclient.ssl_cacertpath)
     else:
-        url = constants.httpUrl + url
+        url = restclient.httpUrl + url
         response = requests.get(url, headers=headers)
+
     # extracting data in json format
     data = response.json()
     url = data["url"]
