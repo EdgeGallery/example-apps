@@ -33,8 +33,8 @@ def get_service_endpoint(service):
 
     # extracting data in json format
     data = response.json()
-    url = data["url"]
-    return url
+    url = data["uris"]
+    return url[0]
 
 
 class Client:
