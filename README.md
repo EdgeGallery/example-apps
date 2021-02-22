@@ -1,4 +1,4 @@
-# example-apps
+﻿# example-apps
 
 #### 介绍
 Example applications based on EdgeGallery
@@ -35,3 +35,71 @@ Example applications based on EdgeGallery
 4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
 5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
 6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+### How to develop an example application
+
+1.Consumer application can easily integrate with MEP/MEP-AGENT to obtain producer application services
+
+2.Every consumer application should be writing 2 to 3 lines of code to acheive this functionality
+
+3.Mep-agent should expose an API’s to get token and service endpoint
+
+4.Consumer application uses consumer client to perform CRUD operations.
+
+5.Example consumer application can leverage mep-agent and consumerclient to communicate with mep-service via kong
+
+6. ClientFactory code is implemented to send request to mep-agent to get service endpoint and based on endpoint information will create a client object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.Consumerclient code is implemented to get access token and send request to mep service via kong
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8.Application code is implemented to send request to consumer client for communicating with mep service via kong api gateway
+
+
