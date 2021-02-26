@@ -46,22 +46,18 @@ class RestClient:
     def __init__(self, endpoint):
         self.endpoint = endpoint
 
-    def post(self, url, body=None, **kwargs):
-        if access_token_enabled and ssl_enabled:
-            access_token = get_access_token()
-            headers = {'Content-Type': contentType, 'Authorization': access_token}
-            response = requests.post(url, data=body, headers=headers, verify=ssl_cacertpath, **kwargs)
-        else:
-            response = requests.post(url, data=body, **kwargs)
+    def post(self, url, body=None, upload_files=None):
+        access_token = get_access_token()
+        access_token = access_token
+        headers = {'Authorization': access_token}
+        response = requests.post(url, data=body, files=upload_files, headers=headers, verify=False)
         return response
 
-    def delete(self, url, **kwargs):
-        if access_token_enabled and ssl_enabled:
-            access_token = get_access_token()
-            headers = {'Content-Type': contentType, 'Authorization': access_token}
-            response = requests.delete(url, headers=headers, verify=ssl_cacertpath, **kwargs)
-        else:
-            response = requests.delete(url, **kwargs)
+    def delete(self, url):
+        access_token = get_access_token()
+        access_token = access_token
+        headers = {'Authorization': access_token}
+        response = requests.delete(url, headers=headers, verify=False)
         return response
 
     def get_endpoint(self):
