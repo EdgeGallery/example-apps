@@ -248,7 +248,7 @@ def video(video_capture, camera_name):
 
         count = 0
         process_this_frame = process_this_frame + 1
-        if process_this_frame == 42:
+        if process_this_frame == 21:
             process_this_frame = 0
 
         ret, jpeg = cv2.imencode('.jpg', frame)
