@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+"""
+Implementation of client factory
+"""
 import requests
 import restclient
 
@@ -21,13 +24,16 @@ clientObjects = {}
 
 
 def get_service_endpoint(service):
-    url = restclient.mep_agent_url + "/mep-agent/v1/endpoint/{0}".format(service)
+    """
+       This is a get service endpoint method for getting endpoint information by using service name
+    """
+    url = restclient.MEP_AGENT_URL + "/mep-agent/v1/endpoint/{0}".format(service)
     headers = {'Content-Type': "application/json"}
-    if restclient.ssl_enabled:
-        url = restclient.httpsUrl + url
-        response = requests.get(url, headers=headers, verify=restclient.ssl_cacertpath)
+    if restclient.SSL_ENABLED:
+        url = restclient.HTTPS_URL + url
+        response = requests.get(url, headers=headers, verify=restclient.SSL_CACERTPATH)
     else:
-        url = restclient.httpUrl + url
+        url = restclient.HTTP_URL + url
         response = requests.get(url, headers=headers)
 
     # extracting data in json format
@@ -40,15 +46,26 @@ def get_service_endpoint(service):
 
 
 class ClientFactory:
+    """
+       This is a class for client factory implementation.
+    """
     #  constructor
     def __init__(self, list_of_services):
         self.update_client_object(list_of_services)
 
+    @staticmethod
     def update_client_object(self, list_of_services):
+        """
+           This is a update client object method to get endpoint information
+        """
         for service in list_of_services:
             endpoint = get_service_endpoint(service)
             if endpoint != "" and "http" in endpoint or "https" in endpoint:
                     clientObjects[service] = restclient.RestClient(endpoint)
 
+    @staticmethod
     def get_client_by_service_name(self, service):
+        """
+           This is a get client by service name method to return client object by using service name
+        """
         return clientObjects[service]

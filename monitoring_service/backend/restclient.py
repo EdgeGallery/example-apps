@@ -14,26 +14,30 @@
 # limitations under the License.
 #
 
-import requests
+"""
+Implementation of rest client
+"""
 import os
+import requests
 
-httpUrl = "http://"
-httpsUrl = "https://"
-mep_agent_url = os.environ.get("MEP_AGENT", "edgegallery.org")
-ssl_enabled = False
-access_token_enabled = False
-contentType = "application/json"
-ssl_cacertpath = "/usr/app/ssl/ca.crt"
+HTTP_URL = "http://"
+HTTPS_URL = "https://"
+MEP_AGENT_URL = os.environ.get("MEP_AGENT", "edgegallery.org")
+SSL_ENABLED = False
+ACCESS_TOKEN_ENABLED = False
+CONTENT_TYPE = "application/json"
+SSL_CACERTPATH = "/usr/app/ssl/ca.crt"
 
 
 def get_access_token():
-    url = mep_agent_url + "/mep-agent/v1/token"
-    headers = {'Content-Type': contentType}
-    if ssl_enabled:
-        url = httpsUrl + url
-        response = requests.get(url, headers=headers, verify=ssl_cacertpath)
+    """Get access token from mep-agent and return access token."""
+    url = MEP_AGENT_URL + "/mep-agent/v1/token"
+    headers = {'Content-Type': CONTENT_TYPE}
+    if SSL_ENABLED:
+        url = HTTPS_URL + url
+        response = requests.get(url, headers=headers, verify=SSL_CACERTPATH)
     else:
-        url = httpUrl + url
+        url = HTTP_URL + url
         response = requests.get(url, headers=headers)
     # extracting data in json format
     data = response.json()
@@ -42,18 +46,30 @@ def get_access_token():
 
 
 class RestClient:
+    """
+       This is a class for rest client implementation.
+    """
     # rest client constructor
     def __init__(self, endpoint):
         self.endpoint = endpoint
 
+    @staticmethod
     def post(self, url, body=None, upload_files=None):
+        """
+           This is a post method for calling mep service via kong
+        """
         access_token = get_access_token()
         access_token = "Bearer " + access_token
         headers = {'Authorization': access_token}
-        response = requests.post(url, data=body, files=upload_files, headers=headers, verify=False)
+        response = requests.post(url, data=body, files=upload_files,
+                                 headers=headers, verify=False)
         return response
 
+    @staticmethod
     def delete(self, url):
+        """
+           This is a delete method for calling mep service via kong
+        """
         access_token = get_access_token()
         access_token = "Bearer " + access_token
         headers = {'Authorization': access_token}
@@ -61,4 +77,7 @@ class RestClient:
         return response
 
     def get_endpoint(self):
+        """
+           This is a get endpoint method for getting endpoint information
+        """
         return self.endpoint
