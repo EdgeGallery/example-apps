@@ -48,14 +48,14 @@ class RestClient:
 
     def post(self, url, body=None, upload_files=None):
         access_token = get_access_token()
-        access_token = access_token
+        access_token = "Bearer " + access_token
         headers = {'Authorization': access_token}
         response = requests.post(url, data=body, files=upload_files, headers=headers, verify=False)
         return response
 
     def delete(self, url):
         access_token = get_access_token()
-        access_token = access_token
+        access_token = "Bearer " + access_token
         headers = {'Authorization': access_token}
         response = requests.delete(url, headers=headers, verify=False)
         return response
