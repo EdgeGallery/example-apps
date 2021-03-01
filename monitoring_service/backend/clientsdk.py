@@ -17,7 +17,6 @@
 import requests
 import restclient
 
-listOfServices = ["facerecognition_service"]
 clientObjects = {}
 
 
@@ -32,22 +31,24 @@ def get_service_endpoint(service):
         response = requests.get(url, headers=headers)
 
     # extracting data in json format
-    data = response.json()
-    url = data["uris"]
-    return url[0]
+    if response:
+        data = response.json()
+        url = data["uris"]
+        return url[0]
+    else:
+        return ""
 
 
-class Client:
+class ClientFactory:
     #  constructor
-    def __init__(self):
-        pass
+    def __init__(self, list_of_services):
+        self.update_client_object(list_of_services)
 
-    def update_client_object(self):
-        for service in listOfServices:
+    def update_client_object(self, list_of_services):
+        for service in list_of_services:
             endpoint = get_service_endpoint(service)
-            if "http" in endpoint or "https" in endpoint:
-                clientObjects[service] = restclient.RestClient(endpoint)
+            if endpoint != "" and "http" in endpoint or "https" in endpoint:
+                    clientObjects[service] = restclient.RestClient(endpoint)
 
     def get_client_by_service_name(self, service):
         return clientObjects[service]
-
