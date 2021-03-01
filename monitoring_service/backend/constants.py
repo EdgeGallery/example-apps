@@ -16,21 +16,22 @@
 
 import config
 
+"""Defined monitoring service constants."""
 # [Constants]
-httpUrl = "http://"
-httpsUrl = "https://"
-recognition_url = config.api_gateway
-mep_agent_url = config.mep_agent
-frontend_url = httpUrl + config.fe_service
-face_position = "Face position"
-received_message = "Received message from ClientIP ["
-operation = "] Operation ["
-resource = " Resource ["
-person_maxsize = "length of the person name is larger than max size"
-contentType = "application/json"
-frontOfCamera = " has appeared in front of camera "
-face_recognition_service = "facerecognition_service"
+HTTP_URL = "http://"
+HTTPS_URL = "https://"
+RECOGNITION_URL = config.api_gateway
+MEP_AGENT_URL = config.MEP_AGENT
+FRONTEND_URL = HTTP_URL + config.FE_SERVICE
+FACE_POSITION = "Face position"
+RECEIVED_MESSAGE = "Received message from ClientIP ["
+OPERATION = "] Operation ["
+RESOURCE = " Resource ["
+PERSON_MAXSIZE = "length of the person name is larger than max size"
+CONTENT_TYPE = "application/json"
+FRONT_OF_CAMERA = " has appeared in front of camera "
+FACE_RECOGNITION_SERVICE = "facerecognition_service"
 WAIT_SECONDS = 1
 PERSON_TIMEOUT_SECONDS = 15
-access_token_enabled = False
-ssl_enabled = False
+ACCESS_TOKEN_ENABLED = False
+SSL_ENABLED = False
