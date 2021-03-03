@@ -178,7 +178,8 @@ def send_notification_msg(camera_name, name):
             listOfMsgs.pop()
         if len(listOfMsgs) == 0:
             COUNT = COUNT + 1
-            newdict = {"msgid": COUNT, "time": time.time(), "relatedObj": name, "cam_flag": "disable",
+            newdict = {"msgid": COUNT, "time": time.time(), "relatedObj": name,
+                       "cam_flag": "disable",
                        "msg": name + constants.FRONT_OF_CAMERA + camera[0]}
             listOfMsgs.insert(0, newdict)
             requests.post(url, json=newdict)
@@ -192,7 +193,8 @@ def send_notification_msg(camera_name, name):
 
         if not person_flag:
             COUNT = COUNT + 1
-            newdict = {"msgid": COUNT, "time": time.time(), "relatedObj": name, "cam_flag": "enable",
+            newdict = {"msgid": COUNT, "time": time.time(), "relatedObj": name,
+                       "cam_flag": "enable",
                        "msg": name + constants.FRONT_OF_CAMERA + camera[0]}
             listOfMsgs.insert(0, newdict)
             requests.post(url, json=newdict)
@@ -202,7 +204,8 @@ def send_notification_msg(camera_name, name):
 
 def thread_function(frame, camera_name):
     """
-        Its a thread function is used to send message to face recognition module for detecting the face
+        Its a thread function is used to send message to face recognition
+        module for detecting the face
     """
     app.logger.info("Thread starting")
 
@@ -211,7 +214,7 @@ def thread_function(frame, camera_name):
     rgb_small_frame = small_frame[:, :, ::-1]
 
     body = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
-    rest_client = clientFactory.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
+    rest_client = CLIENT_FACTORY.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
     url = rest_client.get_endpoint() + "/v1/face-recognition/recognition"
     response = rest_client.post(url, body)
     data = json.loads(response.text)
@@ -281,7 +284,8 @@ def upload_video():
     """
         This method is used to upload a video
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if 'file' in request.files:
         files = request.files.getlist("file")
@@ -299,12 +303,14 @@ def add_camera():
         This method is used to add camera information
     """
     camera_info = request.json
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if len(camera_info["name"]) >= 64 or len(camera_info["location"]) >= 64:
         raise ValidationError("length of the camera name or location is larger than max size")
 
-    camera_info = {"name": camera_info["name"], "rtspurl": camera_info["rtspurl"], "location": camera_info["location"]}
+    camera_info = {"name": camera_info["name"], "rtspurl": camera_info["rtspurl"],
+                   "location": camera_info["location"]}
     listOfCameras.append(camera_info)
     return Response("success")
 
@@ -315,7 +321,8 @@ def get_camera(camera_name):
     通过摄像头人脸识别
     """
     camera_info = {}
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if len(camera_name) >= 64:
         raise ValidationError(constants.PERSON_MAXSIZE)
@@ -335,7 +342,8 @@ def get_camera(camera_name):
     video_file = VideoCamera(camera_info["rtspurl"])
     video_dict = {camera_info["name"]: video_file}
     listOfVideos.append(video_dict)
-    return Response(camera_video(video_file, camera_info["name"]), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(camera_video(video_file, camera_info["name"]),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/v1/monitor/cameras/<camera_name>', methods=['DELETE'])
@@ -343,7 +351,8 @@ def delete_camera(camera_name):
     """
         This method is used to delete camera information
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if len(camera_name) >= 64:
         raise ValidationError("length of the camera name is larger than max size")
@@ -368,7 +377,8 @@ def query_cameras():
     """
         This method is used to query camera information
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     return jsonify(listOfCameras)
 
@@ -378,7 +388,8 @@ def hello_world():
     """
         This method is used to return hello mec developer response
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     return Response("Hello MEC Developer")
 
@@ -388,7 +399,8 @@ def upload():
     """
     图像录入
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     person_info = request.values
     if 'file' not in request.files:
@@ -407,8 +419,9 @@ def upload():
 
     upload_files = []
     for file in files:
-        upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
-    rest_client = clientFactory.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
+        upload_files.append(('file',
+                             open(os.path.join(app.config['UPLOAD_PATH'], file.filename), 'rb')))
+    rest_client = CLIENT_FACTORY.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
     url = rest_client.get_endpoint() + "/v1/face-recognition/upload"
     response = rest_client.post(url, None, upload_files)
     return response.text
@@ -419,7 +432,8 @@ def monitor_person(person_name):
     """
         This method is used to retrieve person information
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if len(person_name) >= 64:
         raise ValidationError(constants.PERSON_MAXSIZE)
@@ -435,13 +449,15 @@ def monitor_persons():
     """
         This method is used to retrieve all person information
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     url = constants.FRONTEND_URL + "/uploadFile"
     upload_files = []
     for _, _, files in os.walk(app.config['UPLOAD_PATH']):
         for file in files:
-            upload_files.append(('file', open(os.path.join(app.config['UPLOAD_PATH'], file), 'rb')))
+            upload_files.append(('file',
+                                 open(os.path.join(app.config['UPLOAD_PATH'], file), 'rb')))
     requests.post(url, files=upload_files)
     return Response("upload success")
 
@@ -452,14 +468,15 @@ def delete_person(person_name):
     This method is used to delete person information
     param: person_name
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if len(person_name) >= 64:
         raise ValidationError(constants.PERSON_MAXSIZE)
 
     person = person_name
     person_name = person_name[0:-4]
-    rest_client = clientFactory.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
+    rest_client = CLIENT_FACTORY.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
     url = rest_client.get_endpoint() + "/v1/face-recognition/{0}".format(person_name)
     response = rest_client.delete(url)
     if response:
@@ -478,7 +495,8 @@ def monitor_messages():
     """
         This method is used to return list of messages
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     list_of_msgs = []
     for msg in listOfMsgs:
@@ -489,7 +507,8 @@ def monitor_messages():
             person_info["highlight"] = "True"
         if current_time - person_info["time"] < 15 and person_info["cam_flag"] == "enable":
             person_info["highlight"] = "True"
-        person_info["time"] = datetime.datetime.fromtimestamp(person_info["time"]).strftime("%Y%m%d-%H:%M:%S")
+        person_info["time"] =\
+            datetime.datetime.fromtimestamp(person_info["time"]).strftime("%Y%m%d-%H:%M:%S")
         list_of_msgs.append(person_info)
     return jsonify(list_of_msgs)
 
@@ -499,7 +518,8 @@ def query_person(person_name):
     """
         This method is used to return specific person information
     """
-    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr + constants.OPERATION + request.method + "]" +
+    app.logger.info(constants.RECEIVED_MESSAGE + request.remote_addr +
+                    constants.OPERATION + request.method + "]" +
                     constants.RESOURCE + request.url + "]")
     if len(person_name) >= 64:
         raise ValidationError(constants.PERSON_MAXSIZE)
@@ -516,10 +536,12 @@ def start_server(handler):
     """
     logging.basicConfig(level=logging.INFO)
     app.logger.addHandler(handler)
-    global clientFactory
-    clientFactory = clientsdk.ClientFactory(listOfServices)
+    global CLIENT_FACTORY
+    CLIENT_FACTORY = clientsdk.ClientFactory(listOfServices)
     if config.SSL_ENABLED:
         context = (config.SSL_CERTFILEPATH, config.SSL_KEYFILEPATH)
-        app.run(host=config.SERVER_ADDRESS, debug=True, ssl_context=context, threaded=True, port=config.SERVER_PORT)
+        app.run(host=config.SERVER_ADDRESS, debug=True,
+                ssl_context=context, threaded=True, port=config.SERVER_PORT)
     else:
         app.run(host=config.SERVER_ADDRESS, debug=True, threaded=True, port=config.SERVER_PORT)
+

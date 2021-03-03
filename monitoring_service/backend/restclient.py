@@ -53,7 +53,6 @@ class RestClient:
     def __init__(self, endpoint):
         self.endpoint = endpoint
 
-    @staticmethod
     def post(self, url, body=None, upload_files=None):
         """
            This is a post method for calling mep service via kong
@@ -65,7 +64,6 @@ class RestClient:
                                  headers=headers, verify=False)
         return response
 
-    @staticmethod
     def delete(self, url):
         """
            This is a delete method for calling mep service via kong
@@ -81,3 +79,4 @@ class RestClient:
            This is a get endpoint method for getting endpoint information
         """
         return self.endpoint
+		

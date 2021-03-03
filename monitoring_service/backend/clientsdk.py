@@ -41,8 +41,7 @@ def get_service_endpoint(service):
         data = response.json()
         url = data["uris"]
         return url[0]
-    else:
-        return ""
+    return ""
 
 
 class ClientFactory:
@@ -53,7 +52,6 @@ class ClientFactory:
     def __init__(self, list_of_services):
         self.update_client_object(list_of_services)
 
-    @staticmethod
     def update_client_object(self, list_of_services):
         """
            This is a update client object method to get endpoint information
@@ -61,11 +59,11 @@ class ClientFactory:
         for service in list_of_services:
             endpoint = get_service_endpoint(service)
             if endpoint != "" and "http" in endpoint or "https" in endpoint:
-                    clientObjects[service] = restclient.RestClient(endpoint)
+                clientObjects[service] = restclient.RestClient(endpoint)
 
-    @staticmethod
     def get_client_by_service_name(self, service):
         """
            This is a get client by service name method to return client object by using service name
         """
         return clientObjects[service]
+

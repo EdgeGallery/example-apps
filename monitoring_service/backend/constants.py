@@ -14,9 +14,12 @@
 # limitations under the License.
 #
 
+
+"""
+    Defined monitoring service constants.
+"""
 import config
 
-"""Defined monitoring service constants."""
 # [Constants]
 HTTP_URL = "http://"
 HTTPS_URL = "https://"
@@ -35,3 +38,4 @@ WAIT_SECONDS = 1
 PERSON_TIMEOUT_SECONDS = 15
 ACCESS_TOKEN_ENABLED = False
 SSL_ENABLED = False
+

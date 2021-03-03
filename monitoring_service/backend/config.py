@@ -14,9 +14,11 @@
 # limitations under the License.
 #
 
+"""
+    Defined monitoring service configuration.
+"""
 import os
 
-"""Defined monitoring service configuration."""
 # [Server Configurations]
 SERVER_PORT = 9997
 SERVER_ADDRESS = os.environ.get('LISTEN_IP', "127.0.0.1")
