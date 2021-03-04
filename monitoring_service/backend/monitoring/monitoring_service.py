@@ -544,4 +544,3 @@ def start_server(handler):
                 ssl_context=context, threaded=True, port=config.SERVER_PORT)
     else:
         app.run(host=config.SERVER_ADDRESS, debug=True, threaded=True, port=config.SERVER_PORT)
-
