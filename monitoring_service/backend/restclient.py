@@ -79,4 +79,3 @@ class RestClient:
            This is a get endpoint method for getting endpoint information
         """
         return self.endpoint
-		

@@ -21,11 +21,7 @@ from logging.handlers import RotatingFileHandler
 from monitoring.monitoring_service import start_server
 
 if __name__ == '__main__':
-    """
-       Starting the monitoring service server
-    """
     handler = RotatingFileHandler('/usr/app/log/monitoring_service.log',
                                   maxBytes=10000000, backupCount=10)
     handler.setLevel(logging.INFO)
     start_server(handler)
-
