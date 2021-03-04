@@ -52,7 +52,8 @@ class ClientFactory:
     def __init__(self, list_of_services):
         self.update_client_object(list_of_services)
 
-    def update_client_object(self, list_of_services):
+    @classmethod
+    def update_client_object(cls, list_of_services):
         """
            This is a update client object method to get endpoint information
         """
@@ -61,7 +62,8 @@ class ClientFactory:
             if endpoint != "" and "http" in endpoint or "https" in endpoint:
                 clientObjects[service] = restclient.RestClient(endpoint)
 
-    def get_client_by_service_name(self, service):
+    @classmethod
+    def get_client_by_service_name(cls, service):
         """
            This is a get client by service name method to return client object by using service name
         """
