@@ -23,7 +23,7 @@ import config
 # [Constants]
 HTTP_URL = "http://"
 HTTPS_URL = "https://"
-RECOGNITION_URL = config.api_gateway
+RECOGNITION_URL = config.API_GATEWAY
 MEP_AGENT_URL = config.MEP_AGENT
 FRONTEND_URL = HTTP_URL + config.FE_SERVICE
 FACE_POSITION = "Face position"

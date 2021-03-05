@@ -16,12 +16,18 @@
 <template>
   <el-card :body-style="{ padding: '0px' }">
     <div class="video-cards">
-      <img
-        :id="data.name"
-        class="video-cards"
-        :src="data.src"
+      <div
+        class="video-player vjs-custom-skin"
         v-if="data.rtspurl.indexOf('mp4')>-1"
       >
+        <video
+          muted
+          loop
+          :id="vidId"
+          width="100%"
+          height="100%"
+        />
+      </div>
       <div
         class="video-player vjs-custom-skin"
         v-if="data.rtspurl.indexOf('mp4')<0"
@@ -92,13 +98,18 @@ export default {
       })
     }
   },
+  computed: {
+    vidId: function () {
+      return this.data.name + 'videoElement'
+    }
+  },
   mounted () {
     if (flvjs.isSupported()) {
-      var videoElement = document.getElementById('videoElement')
+      var videoElement = document.getElementById(this.vidId)
       this.flvPlayer = flvjs.createPlayer({
-        type: 'flv',
+        type: 'mp4',
         isLive: true,
-        url: this.data.rtspurl
+        url: this.data.src
       }, {
         enableWorker: false,
         enableStashBuffer: false,
