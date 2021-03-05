@@ -33,7 +33,7 @@ import clientsdk
 from flask_sslify import SSLify
 from flask_cors import CORS
 from marshmallow import ValidationError
-
+from wsgiref.util import FileWrapper
 app = Flask(__name__)
 CORS(app)
 sslify = SSLify(app)
@@ -275,8 +275,7 @@ def video(video_capture, camera_name):
 
         _, jpeg = cv2.imencode('.jpg', frame)
         time.sleep(.01)
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
+    return ''
 
 
 @app.route('/v1/monitor/video', methods=['POST'])
@@ -336,8 +335,11 @@ def get_camera(camera_name):
         video_file = VideoFile(camera_info["rtspurl"])
         video_dict = {camera_info["name"]: video_file}
         listOfVideos.append(video_dict)
-        return Response(video(video_file, camera_info["name"]),
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
+        thread_2 = threading.Thread(target=video, args=(video_file, camera_info["name"],))
+        thread_2.start()
+        thread_2.join(3)
+        vid_path = os.path.join("/usr/app/test/resources", camera_info["rtspurl"])
+        return Response(FileWrapper(open(vid_path, 'rb')), mimetype='video/mp4')
 
     video_file = VideoCamera(camera_info["rtspurl"])
     video_dict = {camera_info["name"]: video_file}
