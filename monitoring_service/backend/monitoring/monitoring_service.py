@@ -27,9 +27,9 @@ import logging
 import cv2
 import requests
 from flask import Flask, Response, request, jsonify, send_from_directory
-import config
-import constants
-import clientsdk
+from backend import config
+from backend import constants
+from backend import clientsdk
 from flask_sslify import SSLify
 from flask_cors import CORS
 from marshmallow import ValidationError
