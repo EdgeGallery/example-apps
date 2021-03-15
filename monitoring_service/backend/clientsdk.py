@@ -18,7 +18,7 @@
 Implementation of client factory
 """
 import requests
-import restclient
+from backend import restclient
 
 clientObjects = {}
 

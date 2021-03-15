@@ -18,7 +18,7 @@
 """
     Defined monitoring service constants.
 """
-import config
+from backend import config
 
 # [Constants]
 HTTP_URL = "http://"
