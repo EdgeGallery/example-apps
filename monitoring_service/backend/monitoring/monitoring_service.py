@@ -24,16 +24,17 @@ import datetime
 import threading
 import json
 import logging
+from wsgiref.util import FileWrapper
 import cv2
 import requests
 from flask import Flask, Response, request, jsonify, send_from_directory
-from backend import config
-from backend import constants
-from backend import clientsdk
 from flask_sslify import SSLify
 from flask_cors import CORS
 from marshmallow import ValidationError
-from wsgiref.util import FileWrapper
+from backend import config
+from backend import constants
+from backend import clientsdk
+
 app = Flask(__name__)
 CORS(app)
 sslify = SSLify(app)
@@ -273,7 +274,7 @@ def video(video_capture, camera_name):
         if process_this_frame == 21:
             process_this_frame = 0
 
-        _, jpeg = cv2.imencode('.jpg', frame)
+        _, _ = cv2.imencode('.jpg', frame)
         time.sleep(.01)
     return ''
 
