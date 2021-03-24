@@ -19,7 +19,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-from backend.monitoring.monitoring_service import start_server
+from monitoring.monitoring_service import start_server
 
 if __name__ == '__main__':
     handler = RotatingFileHandler('/usr/app/log/monitoring_service.log',
