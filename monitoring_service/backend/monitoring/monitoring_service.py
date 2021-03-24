@@ -31,9 +31,9 @@ from flask import Flask, Response, request, jsonify, send_from_directory
 from flask_sslify import SSLify
 from flask_cors import CORS
 from marshmallow import ValidationError
-from backend import config
-from backend import constants
-from backend import clientsdk
+import config
+import constants
+import clientsdk
 
 app = Flask(__name__)
 CORS(app)
