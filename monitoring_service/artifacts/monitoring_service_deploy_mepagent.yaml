@@ -33,6 +33,8 @@ spec:
         value: 0.0.0.0
       - name: FE_SERVICE
         value: "monitoring-proxy-service-32117:5000"
+      - name: MEP_AGENT
+        value: 127.0.0.1:8080
    {{- if .Values.global.mepagent.enabled }}
   - name: mep-agent
     image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/mep-agent:latest
