@@ -50,7 +50,7 @@ listOfCameras = []
 listOfVideos = []
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
-listOfServices = ["facerecognition_service"]
+listOfServices = ["face-recognition"]
 
 
 class VideoCamera:
