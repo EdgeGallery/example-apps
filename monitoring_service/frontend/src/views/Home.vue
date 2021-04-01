@@ -35,9 +35,6 @@ export default {
       keepAlive: true
     }
   },
-  beforeMount () {
-
-  },
   methods: {
 
   },
