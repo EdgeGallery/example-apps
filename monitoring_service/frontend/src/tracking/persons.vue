@@ -155,10 +155,10 @@
                 alt=""
                 class="el-upload-list__item-thumbnail"
               ><a class="el-upload-list__item-name"><em class="el-icon-document" />{{ item.name }}
-              </a><label class="el-upload-list__item-status-label"><em class="el-icon-upload-success el-icon-check" /></label><i
+              </a><label class="el-upload-list__item-status-label"><em class="el-icon-upload-success el-icon-check" /></label><em
                 class="el-icon-close"
                 @click="beforeDeletePerson(item.name)"
-              /><i class="el-icon-close-tip">按 delete 键可删除</i>
+              /><em class="el-icon-close-tip">按 delete 键可删除</em>
             </li>
           </ul>
         </el-tab-pane>
