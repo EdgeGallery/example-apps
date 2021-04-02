@@ -21,7 +21,7 @@
           style="height:300px; overflow: auto;"
           class="tabs-border"
         >
-          <span slot="label"><i class="el-icon-user" /> Persons</span>
+          <span slot="label"><em class="el-icon-user" /> Persons</span>
           <ul
             class="el-upload-list el-upload-list--picture-card"
             v-for="(item, index) in personsList"
@@ -47,14 +47,14 @@
                   data-v-2ed5c93f=""
                   class="el-upload-list__item-preview"
                   @click="handlePictureCardPreview(item.file)"
-                ><i
+                ><em
                   data-v-2ed5c93f=""
                   class="el-icon-zoom-in"
                 /></span><span
                   data-v-2ed5c93f=""
                   class="el-upload-list__item-delete"
                   @click="beforeDeletePerson(item.name)"
-                ><i
+                ><em
                   data-v-2ed5c93f=""
                   class="el-icon-delete"
                 /></span></span>
@@ -69,7 +69,7 @@
             :show-file-list="false"
             multiple
           >
-            <i
+            <em
               slot="default"
               class="el-icon-plus"
             />
@@ -104,7 +104,7 @@
           style="overflow: auto;"
           class="tabs-border"
         >
-          <span slot="label"><i class="el-icon-user" /> Persons</span>
+          <span slot="label"><em class="el-icon-user" /> Persons</span>
           <h3 class="h3-lable">
             PersonName
           </h3>
@@ -154,8 +154,8 @@
                 :src="item.file"
                 alt=""
                 class="el-upload-list__item-thumbnail"
-              ><a class="el-upload-list__item-name"><i class="el-icon-document" />{{ item.name }}
-              </a><label class="el-upload-list__item-status-label"><i class="el-icon-upload-success el-icon-check" /></label><i
+              ><a class="el-upload-list__item-name"><em class="el-icon-document" />{{ item.name }}
+              </a><label class="el-upload-list__item-status-label"><em class="el-icon-upload-success el-icon-check" /></label><i
                 class="el-icon-close"
                 @click="beforeDeletePerson(item.name)"
               /><i class="el-icon-close-tip">按 delete 键可删除</i>
@@ -178,13 +178,13 @@
         @tab-click="handleClick"
       >
         <el-tab-pane class="tabs-border">
-          <span slot="label"><i class="el-icon-camera" /> Cameras</span>
+          <span slot="label"><em class="el-icon-camera" /> Cameras</span>
           <updatedCameraList
             :data="upDatedCameralist"
           />
         </el-tab-pane>
         <el-tab-pane class="tabs-border">
-          <span slot="label"><i class="el-icon-message" /> Messages</span>
+          <span slot="label"><em class="el-icon-message" /> Messages</span>
           <el-table
             :data="queryMeassages"
             height="300"
