@@ -15,7 +15,7 @@ Example applications based on EdgeGallery
 
 5.Example consumer application can leverage mep-agent and consumerclient to communicate with mep-service via kong
 
-6.ClientFactory code implemented to send request to mep-agent to get service endpoint and based on endpoint information will create a client object
+6.ClientFactory code is implemented to send request to mep-agent to get service endpoint and based on endpoint information will create a client object
 
 def get_service_endpoint(service):
 
