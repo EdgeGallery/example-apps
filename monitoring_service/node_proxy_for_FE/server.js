@@ -42,7 +42,9 @@ app.get('/', function(req, res) {
 app.get('/persons', function(req, res)  {
   let host = req.hostname
   let port1 = env.EXPOSE_PORT
+  console.log("333:"+port1)
   let port2 = parseFloat(port1) - 2
+  console.log("444:"+port2)
   deleteFiles();
   axios.get('http://'+host+':'+port2+'/v1/monitor/persons')
   .then(function (response) {

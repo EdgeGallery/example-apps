@@ -2,17 +2,19 @@
 # -*- coding: utf-8 -*-
 # test face_recognition_app.py
 #
+import psycopg2
+import redis
 import requests
 
 # 录入
-host = "http://face-recognition:32111"
+# host = "http://127.0.0.1:9999"
 # url = host+"/v1/face-recognition/upload"
 #
-# path_upload = '../test/biden.jpg'
+# path_upload = '../test/zhanghailong.png'
 # split_path1 = path_upload.split('/')
 # filename1 = split_path1[-1]
 #
-# path_upload_2 = '../test/obama.jpg'
+# path_upload_2 = '../test/zhanghailong1.png'
 # split_path2 = path_upload_2.split('/')
 # filename2 = split_path2[-1]
 #
@@ -67,11 +69,16 @@ host = "http://face-recognition:32111"
 # result4 = r.text
 # print(result4)
 
+#
+# url = host+"/v1/face-recognition/zhanghailong"
+#
+# r = requests.delete(url)
+# result5 = r.text
+# print(result5)
 
-url = host+"/v1/face-recognition/zhanghailong"
-
-r = requests.delete(url)
-result5 = r.text
-print(result5)
-
-
+try:
+    pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
+    redis_connection = redis.Redis(connection_pool=pool)
+except redis.ConnectionError:
+    print('redis connection is error')
+redis_connection.set("name", "asdadad")

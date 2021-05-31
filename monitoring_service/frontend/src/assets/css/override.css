@@ -22,8 +22,6 @@
 .el-tabs--border-card {
   background:none ;
   border: none ;
-  -webkit-box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important;
-  box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important;
 }
 .el-table, .el-table__expanded-cell {
   background-color: transparent ;
@@ -40,8 +38,8 @@
   background-color: transparent 
 }
 .el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active {
-  color: #409EFF !important;
-  background-color: transparent ;
+      color: #409EFF;
+      background-color: transparent ;
 }
 .el-tabs--border-card>.el-tabs_header .el-tabs_item{
      border: none 
@@ -91,6 +89,16 @@ background-color:transparent;
 .el-table .has-gutter th{
   padding: 7px;
 }
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
+  color: #409EFF !important;
+}
+.el-tabs--border-card>.el-tabs_header .el-tabs_item {
+  border : none
+}
+.el-tabs--border-card{
+  -webkit-box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important;
+          box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19) !important;
+}
 .el-tabs__nav {
   z-index:0 !important;
 }
@@ -128,6 +136,7 @@ background-color:transparent;
   border: none;
 }
 .el-upload {
+  display: inline-block;
   text-align: center;
   cursor: pointer;
   outline: 0;
