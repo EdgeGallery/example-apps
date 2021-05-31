@@ -16,29 +16,19 @@
 <template>
   <el-card :body-style="{ padding: '0px' }">
     <div class="video-cards">
-      <div
-        class="video-player vjs-custom-skin"
+      <img
+        :id="data.name"
+        class="video-cards"
+        :src="data.src"
         v-if="data.rtspurl.indexOf('mp4')>-1"
       >
-        <video
-          muted
-          loop
-          :id="vidId"
-          width="100%"
-          height="100%"
-        />
-      </div>
-      <div
+      <video-player
         class="video-player vjs-custom-skin"
+        ref="videoPlayer"
+        :playsinline="true"
+        :options="playerOptions"
         v-if="data.rtspurl.indexOf('mp4')<0"
-      >
-        <video
-          muted
-          id="videoElement"
-          width="100%"
-          height="100%"
-        />
-      </div>
+      />
     </div>
     <div style="padding: 14px;">
       <div class="camera-details-con">
@@ -57,7 +47,6 @@
 </template>
 
 <script>
-import flvjs from 'flv.js'
 export default {
   name: 'Camerapannel',
   props: {
@@ -74,7 +63,32 @@ export default {
   },
   data () {
     return {
-      flvPlayer: null
+      value: 'I am the child.',
+      isCameraPanel: false,
+      local: false,
+      // 视频播放
+      playerOptions: {
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        autoplay: true,
+        muted: false,
+        loop: false,
+        preload: 'auto',
+        language: 'zh-CN',
+        aspectRatio: '16:9',
+        techOrder: ['flash', 'html5'],
+        hls: { withCredentials: false },
+        html5: { hls: { withCredentials: false } },
+        sources: [],
+        poster: '',
+        width: document.documentElement.clientWidth,
+        notSupportedMessage: '此视频暂无法播放，请稍后再试',
+        controlBar: {
+          timeDivider: true,
+          durationDisplay: true,
+          remainingTimeDisplay: false,
+          fullscreenToggle: true
+        }
+      }
     }
   },
   methods: {
@@ -98,35 +112,8 @@ export default {
       })
     }
   },
-  computed: {
-    vidId: function () {
-      return this.data.name + 'videoElement'
-    }
-  },
   mounted () {
-    if (flvjs.isSupported()) {
-      var videoElement = document.getElementById(this.vidId)
-      this.flvPlayer = flvjs.createPlayer({
-        type: 'mp4',
-        isLive: true,
-        url: this.data.src
-      }, {
-        enableWorker: false,
-        enableStashBuffer: false,
-        isLive: true,
-        lazyLoad: false,
-        stashInitialSize: 0,
-        autoCleanupSourceBuffer: true
-      })
-      this.flvPlayer.attachMediaElement(videoElement)
-      this.flvPlayer.load()
-      let playPromise = this.flvPlayer.play()
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          this.flvPlayer.play()
-        }).catch((e) => { console.log(e) })
-      }
-    }
+    this.playerOptions.sources.push(this.data)
   }
 }
 </script>

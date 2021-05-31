@@ -63,7 +63,7 @@
         </div>
         <div class="logo-header">
           <span>Monitoring Service</span>
-          <em class="el-icon-user-solid" />
+          <i class="el-icon-user-solid" />
         </div>
       </div>
     </div>
@@ -83,6 +83,8 @@ export default {
     }
   },
   watch: {
+  },
+  mounted () {
   },
   methods: {
     jumpLogoTo () {
@@ -172,6 +174,7 @@ export default {
     font-size: 21px;
     color: white;
     font-weight: bold;
+    display: flex;
     display: flex;
     flex-direction: row;
     align-items: center;

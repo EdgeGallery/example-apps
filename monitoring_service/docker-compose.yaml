@@ -1,47 +1,44 @@
-#
-# Copyright 2020 Huawei Technologies Co., Ltd.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 version: '3'
-
-
 services:
-    monitor-be-service:
-      image: monitoring
-      ports:
-        - "0.0.0.0:9997:9997"
-      container_name: monitor-be-service
-      network_mode: host
-      hostname: monitor-be-service
-      environment:
-        - LISTEN_IP=127.0.0.1
-      volumes:
-        - /home/EG-LDVS/mepserver:/usr/app/ssl
-
-    monitor-fe-service:
-      image: femonitoring
-      ports:
-        - "0.0.0.0:8080:8080"
-      container_name: monitor-fe-service
-      network_mode: host
-      hostname: monitor-fe-service
-
-    monitor-proxy-service:
-      image: proxy
-      ports:
-        - "0.0.0.0:5000:5000"
-      container_name: monitor-proxy-service
-      network_mode: host
-      hostname: monitor-proxy-service
+  face-recognition-postgresql:
+    image: "postgres:9.6.15"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    container_name: face-recognition-postgresql
+  face-recognition:     
+    image: "swr.ap-southeast-1.myhuaweicloud.com/edgegallery/face_recognition_app:v1.5"   
+    ports:   
+      - "9999:9999"
+    container_name: face-recognition  
+    environment:
+      POSTGRES_HOST: face-recognition-postgresql
+      REDIS_HOST: face-recognition-redis
+  face-recognition-redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    container_name: face-recognition-redis
+  monitoring-be-32115:
+    image: "swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-be-service:1.0"
+    restart: always
+    environment: 
+      LISTEN_IP: 0.0.0.0
+      FE_SERVICE: "monitoring-proxy-service:5000"
+    ports:
+      - "32115:9997"
+  monitoring-fe-service-32116:
+    image: "swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-fe-service:1.0"
+    restart: always
+    ports:
+      - "32116:8080" 
+  monitoring-proxy-service-32117:
+    image: "swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-proxy-service:1.0"
+    restart: always
+    environment:
+      EXPOSE_PORT: "32117"
+    ports:
+    - "32117:5000"
+    container_name: monitoring-proxy-service

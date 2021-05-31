@@ -14,27 +14,28 @@
 # limitations under the License.
 #
 
-"""
-    Defined monitoring service configuration.
-"""
 import os
 
 # [Server Configurations]
-SERVER_PORT = 9997
-SERVER_ADDRESS = os.environ.get('LISTEN_IP', "127.0.0.1")
+server_port = 9997
+server_address = os.environ.get('LISTEN_IP', "127.0.0.1")
 
 # [SSL Configurations]
-SSL_ENABLED = False
-SSL_PROTOCOL = "TLSv1.2"
-SSL_CIPHERS = ["TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+ssl_enabled = False
+ssl_protocol = "TLSv1.2"
+ssl_ciphers = ["TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
           "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"]
-SSL_CERTFILEPATH = "/usr/app/ssl/server_tls.crt"
-SSL_KEYFILEPATH = "/usr/app/ssl/server_tls.key"
-SSL_CACERTPATH = "/home/root1/mec-deploy/certs/ca.crt"
-SSL_SERVER_NAME = os.environ.get('SERVER_NAME', "edgegallery")
+ssl_certfilepath = "/usr/app/ssl/server_tls.crt"
+ssl_keyfilepath = "/usr/app/ssl/server_tls.key"
+ssl_cacertpath = "/usr/app/ssl/ca.crt"
+ssl_server_name = os.environ.get('SERVER_NAME', "edgegallery")
 
 # [Service Configurations]
-API_GATEWAY = os.environ.get("API_GATEWAY", "face-recognition:9999")
-FACE_RECOGNITION = os.environ.get("FACE_RECOGNITION", "facerecognition")
-MEP_AGENT = os.environ.get("MEP_AGENT", "edgegallery.org")
-FE_SERVICE = os.environ.get("FE_SERVICE", "monitoring-proxy-service:5000")
+api_gateway = os.environ.get("API_GATEWAY", "face-recognition:9999")
+#api_gateway = os.environ.get("API_GATEWAY", "127.0.0.1:9999")
+face_recognition = os.environ.get("FACE_RECOGNITION", "facerecognition")
+mep_agent = os.environ.get("MEP_AGENT", "edgegallery.org")
+fe_service = os.environ.get("FE_SERVICE", "monitoring-proxy-service:5000")
+#fe_service = os.environ.get("FE_SERVICE", "127.0.0.1:5000")
+
+

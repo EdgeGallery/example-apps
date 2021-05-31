@@ -25,6 +25,7 @@ export default {
   name: 'App',
   components: {
   },
+  mounted () {},
   methods: {},
   beforeCreate () {
     if (sessionStorage.getItem('before_route')) {
