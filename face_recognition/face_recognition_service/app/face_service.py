@@ -79,7 +79,7 @@ def take_photo(url):
         frame = cv2.resize(frame, (0, 0), fx=0.6, fy=0.6)
         # Resize frame of video to 1/4 size for faster face recognition processing
         small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-        # 使用generator函数输出视频流，每次请求输出的content类型是images/jpeg
+        # usegeneratorFunction output video stream，Output per requestcontentType isimages/jpeg
         if frame is None:
             return make_response(jsonify({'result': 'camera url is error'}), 403)
         ret, jpeg = cv2.imencode('.jpg', small_frame)
@@ -94,7 +94,7 @@ def face_upload(img, file_image):
     人脸信息上传
     param: img, file
     """
-    # 连接redis
+    # connectionredis
     try:
         pool = redis.ConnectionPool(host=REDIS_HOST, port=6379)
         redis_connection = redis.Redis(connection_pool=pool)
@@ -105,7 +105,7 @@ def face_upload(img, file_image):
     if len(face_locations) != 1:
         raise IOError('face number is only one')
     if file_image and allowed_file(file_image.filename):
-        # 保存在postgres数据库中
+        # Save aspostgresIn the database
         try:
             conn = psycopg2.connect(host=POSTGRES_HOST, user=POSTGRES_USER,
                                     password=POSTGRES_PASSWORD, database=POSTGRES_DATABASE,
@@ -135,8 +135,8 @@ def face_upload(img, file_image):
     else:
         raise IOError('picture format is error')
     face_encodings = face_recognition.face_encodings(image, face_locations)
-    # 连redis数据库
-    # 录入人名-对应特征向量
+    # evenredisdatabase
+    # Enter the person's name-Corresponding feature vector
     redis_connection.set(name, face_encodings[0].tobytes())
 
 
@@ -145,7 +145,7 @@ def face_find(file_image):
     人脸信息查找
     param: file
     """
-    # 连接redis
+    # connectionredis
     try:
         pool = redis.ConnectionPool(host=REDIS_HOST, port=6379)
         redis_connection = redis.Redis(connection_pool=pool)
@@ -155,10 +155,10 @@ def face_find(file_image):
     image = face_recognition.load_image_file(file_image)
     face_locations = face_recognition.face_locations(image)
     face_encodings = face_recognition.face_encodings(image, face_locations)
-    # 取出所有的人名和它对应的特征向量
+    # Take out all the names of people and their corresponding feature vectors
     names = redis_connection.keys()
     faces = redis_connection.mget(names)
-    # 组成矩阵，计算相似度（欧式距离）
+    # Make up a matrix，Calculate similarity（Euclidean distance）
     find_names = []
     for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
         matches = face_recognition.compare_faces([np.frombuffer(x) for x in faces], face_encoding, tolerance=0.42)
@@ -206,24 +206,24 @@ def refresh_redis():
     """
     刷新redis
     """
-    # 连接redis
+    # connectionredis
     try:
         pool = redis.ConnectionPool(host=REDIS_HOST, port=6379)
         redis_connection = redis.Redis(connection_pool=pool)
     except redis.ConnectionError:
         print('redis connection is error')
-    # 1.连接mysql数据库
+    # 1.connectionmysqldatabase
     try:
         conn = psycopg2.connect(host=POSTGRES_HOST, user=POSTGRES_USER,
                                 password=POSTGRES_PASSWORD, database=POSTGRES_DATABASE,
                                 port=5432)
     except requests.RequestException:
         print('postgres connection is error')
-    # 2.创建游标
+    # 2.Create cursor
     cursor = conn.cursor()
     sql = "select * from image_data"
     cursor.execute(sql)  # 执行sql
-    # 查询所有数据，返回结果默认以元组形式，所以可以进行迭代处理
+    # Query all data，The returned result is in the form of a tuple by default，So iterative processing
     for i in cursor.fetchall():
         name = i[0]  # get name
         data = i[1]  # get data
@@ -231,7 +231,7 @@ def refresh_redis():
         image = face_recognition.load_image_file(io.BytesIO(data))
         face_locations = face_recognition.face_locations(image)
         face_encodings = face_recognition.face_encodings(image, face_locations)
-        # 录入人名-对应特征向量
+        # Enter the person's name-Corresponding feature vector
         redis_connection.set(name, face_encodings[0].tobytes())
     cursor.close()
     conn.close()
@@ -244,11 +244,11 @@ def video_camera(file_image):
     视频监控/笔记本
     param: file
     """
-    # 连接redis
+    # connectionredis
     pool = redis.ConnectionPool(host=REDIS_HOST, port=6379)
     redis_connection = redis.Redis(connection_pool=pool)
-    # 连数据库
-    # 取出所有的人名和它对应的特征向量
+    # Connect to the database
+    # Take out all the names of people and their corresponding feature vectors
     names = redis_connection.keys()
     known_faces = redis_connection.mget(names)
     if file_image == "0":
@@ -317,14 +317,14 @@ def web_video(url):
     视频监控/摄像头
     param: file
     """
-    # 连接redis
+    # connectionredis
     try:
         pool = redis.ConnectionPool(host=REDIS_HOST, port=6379)
         redis_connection = redis.Redis(connection_pool=pool)
     except redis.ConnectionError:
         print('redis connection is error')
-    # 连数据库
-    # 取出所有的人名和它对应的特征向量
+    # Connect to the database
+    # Take out all the names of people and their corresponding feature vectors
     names = redis_connection.keys()
     known_faces = redis_connection.mget(names)
     face_locations = []
@@ -384,13 +384,13 @@ def face_delete(name):
     人脸信息删除
     param: name
     """
-    # 连接redis
+    # connectionredis
     try:
         pool = redis.ConnectionPool(host=REDIS_HOST, port=6379)
         redis_connection = redis.Redis(connection_pool=pool)
     except redis.ConnectionError:
         print('redis connection is error')
-    # 在数据库中查询
+    # Query in the database
     try:
         conn = psycopg2.connect(host=POSTGRES_HOST, user=POSTGRES_USER,
                                 password=POSTGRES_PASSWORD, database=POSTGRES_DATABASE,
