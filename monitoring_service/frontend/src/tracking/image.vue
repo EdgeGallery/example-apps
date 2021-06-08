@@ -20,14 +20,14 @@
         :id="data.name"
         class="video-cards"
         :src="data.src"
-        v-if="data.rtspurl.indexOf('mp4')>-1"
+        v-if="data.subType == 'image'"
       >
       <video-player
         class="video-player vjs-custom-skin"
         ref="videoPlayer"
         :playsinline="true"
         :options="playerOptions"
-        v-if="data.rtspurl.indexOf('mp4')<0"
+        v-if="data.subType == 'video'"
       />
     </div>
     <div style="padding: 14px;">
