@@ -222,9 +222,9 @@ class RecognitionThread(threading.Thread):
                 video_obj = video[self.camera_name]
                 if video_obj is self.video:
                     # video_obj.delete()
-                    appp.logger.info('listOfVideos remover.before:' + str(len(listOfVideos)))
+                    app.logger.info('listOfVideos remover.before:' + str(len(listOfVideos)))
                     listOfVideos.remove(video_obj)
-                    appp.logger.info('listOfVideos remover.after:' + str(len(listOfVideos)))
+                    app.logger.info('listOfVideos remover.after:' + str(len(listOfVideos)))
                     break
                 
         self.video.delete()
