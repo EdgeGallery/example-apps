@@ -49,21 +49,20 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
 
 
-class VideoCamera(object, camera_name):
+class VideoCamera(object):
     """
     通过opencv获取实时视频流
     """
-    def __init__(self, url):
+    def __init__(self, url, camera_name):
         if url == "0":
             url = int(url)
         self.stop = False
         self.url = url
         self.camera_name = camera_name
         self.video = cv2.VideoCapture(url)
-        
 
     def delete(self):
-        self.stopped()
+        self.stoped()
         self.video.release()
     
     def isStoped(self):
@@ -103,7 +102,7 @@ class VideoFile(object):
         self.video = cv2.VideoCapture(self.url)
 
     def delete(self):
-        self.stopped()
+        self.stoped()
         self.video.release()
         
     def isStoped(self):
@@ -232,7 +231,7 @@ class RecognitionThread(threading.Thread):
     
     def run(self):
         app.logger.info("Thread starting")
-        while video.isOpened():
+        while True:
             try:
                 frame = self.queue.get(timeout=10)
             except Exception:
