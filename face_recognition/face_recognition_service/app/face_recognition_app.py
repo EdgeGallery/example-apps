@@ -39,7 +39,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 CORS(app, resources=r'/*')
 
-# 人脸录入页
+# Face Entry Page
 @app.route('/v1/face-recognition/upload', methods=['GET'])
 def html():
     """
@@ -47,8 +47,8 @@ def html():
     """
     return '''
     <!doctype html>
-    <title>人脸录入</title>
-    <h1>人脸录入</h1>
+    <title>Face entry</title>
+    <h1>Face entry</h1>
     <form method="POST" action="/v1/face-recognition/upload" enctype="multipart/form-data">
       <input type="file" name="file" multiple="multiple">
       <input type="submit" value="submit">
@@ -56,7 +56,7 @@ def html():
     '''
 
 
-# 调用摄像头POST
+# Call cameraPOST
 @app.route('/v1/face-recognition/camera', methods=['POST'])
 def camera_post():
     """
@@ -78,7 +78,7 @@ def camera_post():
     return response
 
 
-# 调用摄像头
+# Call camera
 @app.route('/v1/face-recognition/camera', methods=['GET'])
 def camera_get():
     """
@@ -94,7 +94,7 @@ def camera_get():
                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-# 人脸采集
+# Face collection
 @app.route('/v1/face-recognition/collection', methods=['GET'])
 def collection():
     """
@@ -111,7 +111,7 @@ def collection():
     return response1
 
 
-# 人脸采集
+# Face collection
 @app.route('/v1/face-recognition/collection', methods=['POST'])
 def collection_post():
     """

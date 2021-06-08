@@ -4,7 +4,7 @@
 #
 import requests
 
-# 录入
+# Input
 host = "http://face-recognition:32111"
 # url = host+"/v1/face-recognition/upload"
 #
@@ -22,7 +22,7 @@ host = "http://face-recognition:32111"
 # r = requests.post(url, files=files)
 # result = r.text
 #
-# # 识别
+# # Identify
 # url = host+"/v1/face-recognition/recognition"
 #
 # file_path = '../test/two_people.jpg'
@@ -35,7 +35,7 @@ host = "http://face-recognition:32111"
 # r = requests.post(url, files=files)
 # result1 = r.text
 #
-# # 对比
+# # Compared
 # url = host + "/v1/face-recognition/comparison"
 # path_upload = '../test/two_people.jpg'
 # split_path1 = path_upload.split('/')
@@ -52,7 +52,7 @@ host = "http://face-recognition:32111"
 # result2 = r.text
 # print(result2)
 #
-# # 视频监控
+# # Video Surveillance
 # url = host + "/v1/face-recognition/video"
 # data = {"url": "rstp://admin:HuaWei123@192.168.15.120:554"}
 # result = requests.post(url, json=data)
@@ -60,7 +60,7 @@ host = "http://face-recognition:32111"
 # print(result)
 #
 #
-# # 刷新redis
+# # Refreshredis
 # url = "http://159.138.5.41:32116/v1/face-recognition/refresh"
 #
 # r = requests.post(url)
