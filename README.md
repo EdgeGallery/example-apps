@@ -1,90 +1,90 @@
-﻿# example-apps
+﻿# 示例应用
 
-#### 介绍
-Example applications based on EdgeGallery
+＃＃＃＃ 介绍
+基于 EdgeGallery 的示例应用程序
 
-### How to develop an example application
+### 如何开发示例应用程序
 
-1.Consumer application can easily integrate with MEP/MEP-AGENT to obtain producer application services
+1.消费者应用可以方便地与MEP/MEP-AGENT集成，获得生产者应用服务
 
-2.Every consumer application should be writing 2 to 3 lines of code to acheive this functionality
+2.每个消费者应用程序都应该编写 2 到 3 行代码来实现此功能
 
-3.Mep-agent should expose an API’s to get token and service endpoint
+3.Mep-agent 应该公开一个 API 来获取令牌和服务端点
 
-4.Consumer application uses consumer client to perform CRUD operations.
+4.Consumer 应用程序使用消费者客户端来执行 CRUD 操作。
 
-5.Example consumer application can leverage mep-agent and consumerclient to communicate with mep-service via kong
+5.示例消费者应用程序可以利用 mep-agent 和 consumerclient 通过 kong 与 mep-service 通信
 
-6.ClientFactory code is implemented to send request to mep-agent to get service endpoint and based on endpoint information will create a client object
+6.ClientFactory 代码实现向 mep-agent 发送请求以获取服务端点，并根据端点信息创建一个客户端对象
 
 def get_service_endpoint(service):
 
     url = restclient.mep_agent_url + "/mep-agent/v1/endpoint/{0}".format(service)
     headers = {'Content-Type': "application/json"}
-    if restclient.ssl_enabled:
+    如果 restclient.ssl_enabled：
         url = restclient.httpsUrl + url
         response = requests.get(url, headers=headers, verify=restclient.ssl_cacertpath)
-    else:
+    别的：
         url = restclient.httpUrl + url
         response = requests.get(url, headers=headers)
-    # extracting data in json format
-    if response:
-        data = response.json()
-        url = data["uris"]
-        return url[0]
-    else:
-        return ""
+    # 以json格式提取数据
+    如果回应：
+        数据 = response.json()
+        url = 数据["uris"]
+        返回网址[0]
+    别的：
+        返回 ””
 
-class ClientFactory:
+类客户端工厂：
 
-    #  constructor
+    # 构造函数
     def __init__(self, list_of_services):
         self.update_client_object(list_of_services)
     def update_client_object(self, list_of_services):
-        for service in list_of_services:
-            endpoint = get_service_endpoint(service)
-            if endpoint != "" and "http" in endpoint or "https" in endpoint:
+        对于 list_of_services 中的服务：
+            端点 = get_service_endpoint(service)
+            如果端点 != "" 和 "http" 在端点或 "https" 在端点：
                     clientObjects[service] = restclient.RestClient(endpoint)
     def get_client_by_service_name(self, service):
-        return clientObjects[service]
+        返回客户端对象[服务]
 
-7.Consumerclient code is implemented to get access token and send request to mep service via kong
+7.Consumerclient代码实现获取访问令牌并通过kong向mep服务发送请求
 
 def get_access_token():
 
     url = mep_agent_url + "/mep-agent/v1/token"
     headers = {'Content-Type': contentType}
-    if ssl_enabled:
+    如果 ssl_enabled：
         url = httpsUrl + url
         response = requests.get(url, headers=headers, verify=ssl_cacertpath)
-    else:
+    别的：
         url = httpUrl + url
         response = requests.get(url, headers=headers)
-    # extracting data in json format
-    data = response.json()
-    access_token = data["access_token"]
-    return access_token
-class RestClient:
+    # 以json格式提取数据
+    数据 = response.json()
+    access_token = 数据["access_token"]
+    返回 access_token
+类 RestClient：
 
-    # rest client constructor
-    def __init__(self, endpoint):
-        self.endpoint = endpoint
-    def post(self, url, body=None, upload_files=None):
+    # 休息客户端构造函数
+    def __init__(self,endpoint):
+        self.endpoint = 端点
+    def post(self, url, body=None,upload_files=None):
         access_token = get_access_token()
         access_token = "Bearer " + access_token
-        headers = {'Authorization': access_token}
+        headers = {'授权'：access_token}
         response = requests.post(url, data=body, files=upload_files, headers=headers, verify=False)
-        return response
-    def delete(self, url):
+        返回响应
+    定义删除（自我，网址）：
         access_token = get_access_token()
         access_token = "Bearer " + access_token
-        headers = {'Authorization': access_token}
+        headers = {'授权'：access_token}
         response = requests.delete(url, headers=headers, verify=False)
-        return response
+        返回响应
     def get_endpoint(self):
-        return self.endpoint
+        返回 self.endpoint
 
-8.Application code is implemented to send request to consumer client for communicating with mep service via kong api gateway
+8.应用代码实现向消费者客户端发送请求，通过kong api网关与mep服务进行通信
 
     rest_client = clientFactory.get_client_by_service_name(constants.face_recognition_service)
     url = rest_client.get_endpoint() + "/v1/face-recognition/recognition"
