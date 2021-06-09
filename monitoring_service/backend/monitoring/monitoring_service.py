@@ -28,6 +28,9 @@ import logging
 from flask_sslify import SSLify
 from flask_cors import CORS
 from marshmallow import ValidationError
+import queue
+from pip._internal import self_outdated_check
+from test.test_tracemalloc import frame
 
 app = Flask(__name__)
 CORS(app)
@@ -50,19 +53,35 @@ class VideoCamera(object):
     """
     通过opencv获取实时视频流
     """
-    def __init__(self, url):
+    def __init__(self, url, camera_name):
         if url == "0":
             url = int(url)
+        self.stop = False
+        self.url = url
+        self.camera_name = camera_name
         self.video = cv2.VideoCapture(url)
 
     def delete(self):
+        self.stoped()
         self.video.release()
+    
+    def isStoped(self):
+        return self.stop
+    
+    def stoped(self):
+        self.stop = True
+
 
     def get_frame(self):
         """
         获取实时视频流
         """
         success, image = self.video.read()
+        if not success and not self.stop:
+            self.video.release()
+            self.video = cv2.VideoCapture(self.url)
+            success, image = self.video.read
+            app.logger.info('==>reinit:'+self.url+'==>'+str(len(listOfVideos))+','+str(success))
         return success, image
 
     def reset_frame(self):
@@ -77,16 +96,28 @@ class VideoFile(object):
     通过opencv获取实时视频流
     """
     def __init__(self, video_name):
-        self.video = cv2.VideoCapture("/usr/app/test/resources/" + video_name)
+        self.stop = False
+        self.video_name = video_name
+        self.url = "/usr/app/test/resources/" + video_name
+        self.video = cv2.VideoCapture(self.url)
 
     def delete(self):
+        self.stoped()
         self.video.release()
+        
+    def isStoped(self):
+        return self.stop
+    
+    def stoped(self):
+        self.stop = True
 
     def get_frame(self):
         """
         获取实时视频流
         """
         success, image = self.video.read()
+        if not success:
+            app.logger.info('==>Video read not success,Thread count and listOfVideos count=>'+self.url+','+str(len(threading.enumerate()))+','+str(len(listOfVideos)))
         return success, image
 
     def reset_frame(self):
@@ -175,27 +206,62 @@ def send_notification_msg(camera_name, name):
             listOfMsgs.insert(0, newdict)
             requests.post(url, json=newdict)
 
-
-def thread_function(frame, camera_name):
-    app.logger.info("Thread starting")
-
-    small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-    # Convert the image from BGR color  to RGB color
-    rgb_small_frame = small_frame[:, :, ::-1]
-
-    url = constants.recognition_url + "/v1/face-recognition/recognition"
-    info1 = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
-    if constants.access_token_enabled and constants.ssl_enabled:
-        access_token = get_access_token()
-        headers = {'Content-Type': 'application/json', 'Authorization': access_token}
-        data = json.loads(requests.post(url, data=info1, headers=headers, verify=config.ssl_cacertpath).text)
-    else:
-        data = json.loads(requests.post(url, data=info1).text)
-
-    for info in data:
-        name = info['Name']
-        send_notification_msg(camera_name, name)
-
+class RecognitionThread(threading.Thread):
+    def __init__(self, name, video):
+        threading.Thread.__init__(self, name = name)
+        self.video = video
+        self.queue = queue.Queue()
+        self.camera_name = name
+        
+    def putFrame(self, frame):
+        self.queue.put(frame)
+    
+    def deleteListOfVideos(self):
+        for video in listOfVideos:
+            if self.camera_name in video:
+                video_obj = video[self.camera_name]
+                if video_obj is self.video:
+                    # video_obj.delete()
+                    app.logger.info('listOfVideos remover.before:' + str(len(listOfVideos)))
+                    listOfVideos.remove(video_obj)
+                    app.logger.info('listOfVideos remover.after:' + str(len(listOfVideos)))
+                    break
+                
+        self.video.delete()
+    
+    def run(self):
+        app.logger.info("Thread starting")
+        while True:
+            try:
+                frame = self.queue.get(timeout=10)
+            except Exception:
+                self.video.stoped()
+                self.deleteListOfVideos()
+                app.logger.info("Timeout exceptin thread exit:" + self.name)
+            else:
+                small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+                # Convert the image from BGR color  to RGB color            
+                rgb_small_frame = small_frame[:, :, ::-1]
+                url = constants.recognition_url + "/v1/face-recognition/recognition"
+                info1 = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
+                if constants.access_token_enabled and constants.ssl_enabled:
+                     access_token = get_access_token()
+                     headers = {'Content-Type': 'application/json', 'Authorization': access_token}
+                     try:
+                         result = requests.post(url, data=info1, headers=headers, verify=config.ssl_cacertpath)
+                     except Exception:
+                        continue
+                else:
+                    try:
+                        result = requests.post(url, data=info1)
+                    except Exception:
+                        continue
+                    
+                if result.status_code == 200:
+                    data = json.loads(result.text)
+                    for info in data:
+                        name = info['Name']
+                        send_notification_msg(self.camera_name, name)
 
 def camera_video(video_capture, camera_name):
     """
@@ -203,14 +269,16 @@ def camera_video(video_capture, camera_name):
     """
     app.logger.info("camera video")
     process_this_frame = 0
+    thread = RecognitionThread(name = camera_name, video = video_capture)
+    thread.start()
     while True:
         success, frame = video_capture.get_frame()
         if not success:
+            app.logger.info('====>camera:' + camera_name + ',not success read frame.')
             break
         if process_this_frame == 0:
-            x = threading.Thread(target=thread_function, args=(frame, camera_name,))
-            x.start()
-            x.join(3)
+            if thread.is_alive():
+                thread.putFrame(frame)
 
         process_this_frame = process_this_frame + 1
         if process_this_frame == 42:
@@ -228,6 +296,8 @@ def video(video_capture, camera_name):
     app.logger.info("local video")
     process_this_frame = 0
     count = 0
+    thread = RecognitionThread(name = camera_name, video = video_capture)
+    thread.start()    
     while True:
         success, frame = video_capture.get_frame()
         if count == 5:
@@ -237,9 +307,8 @@ def video(video_capture, camera_name):
             count = count + 1
             continue
         if process_this_frame == 0:
-            x = threading.Thread(target=thread_function, args=(frame, camera_name,))
-            x.start()
-            x.join(3)
+            if thread.is_alive():
+                thread.putFrame(frame)
 
         count = 0
         process_this_frame = process_this_frame + 1
@@ -302,7 +371,7 @@ def get_camera(camera_name):
         return Response(video(video_file, camera_info["name"]),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
     else:
-        video_file = VideoCamera(camera_info["rtspurl"])
+        video_file = VideoCamera(camera_info["rtspurl"], camera_name)
         video_dict = {camera_info["name"]: video_file}
         listOfVideos.append(video_dict)
         return Response(camera_video(video_file, camera_info["name"]), mimetype='multipart/x-mixed-replace; boundary=frame')
