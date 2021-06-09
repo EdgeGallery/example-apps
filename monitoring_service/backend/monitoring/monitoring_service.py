@@ -30,7 +30,7 @@ from flask_cors import CORS
 from marshmallow import ValidationError
 import queue
 from pip._internal import self_outdated_check
-from test.test_tracemalloc import frame
+# from test.test_tracemalloc import frame
 
 app = Flask(__name__)
 CORS(app)

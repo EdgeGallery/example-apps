@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-be-service       #参数 service名
+  labels:
+    app: monitoring-be-service
+spec:
+  type: NodePort
+  ports:
+  - port: 9997
+    targetPort: 9997
+    nodePort: 32115        #参数  service端口
+    name: http
+  selector:
+    app: monitoring-be       #参数 labels、selector一致，都为镜像名
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitoring-be  #参数 pod名
+  labels: 
+    app: monitoring-be
+spec:
+  containers:
+  - name: monitoring-be-service-deployment
+    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-be-service:latest        #参数 ip+镜像名：版本
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 9997                            #参数
+    env:
+      - name: LISTEN_IP
+        value: 0.0.0.0
+      - name: API_GATEWAY
+        value: face-recognition:32111
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-fe-service       #参数 service名
+  labels:
+    app: monitoring-fe-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 32116        #参数  service端口
+    name: http
+  selector:
+    app: monitoring-fe       #参数 labels、selector一致，都为镜像名
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitoring-fe   #参数 pod名
+  labels: 
+    app: monitoring-fe
+spec:
+  containers:
+  - name: monitoring-fe-service-deployment
+    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-fe-service:latest        #参数 ip+镜像名：版本
+    imagePullPolicy: Always
+    ports:
+      - containerPort: 8080                            #参数
+    env:
+      - name: BACKEND_PORT
+        value: "32115"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-proxy-service       #参数 service名
+  labels:
+    app: monitoring-proxy-service
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 32117        #参数  service端口
+    name: http
+  selector:
+    app: monitoring-proxy       #参数 labels、selector一致，都为镜像名
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitoring-proxy   #参数 pod名
+  labels: 
+    app: monitoring-proxy
+spec:
+  containers:
+  - name: monitoring-proxy-service-deployment
+    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-proxy-service:latest        #参数 ip+镜像名：版本
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 5000                            #参数     
+    env:
+      - name: EXPOSE_PORT
+        value: "32117"
+  
