@@ -69,10 +69,8 @@ RUN apt-get install -y --fix-missing \
 WORKDIR $APP_HOME
 
 # Copy the application & scripts
-COPY config.py requirements.txt run.py constants.py clientsdk.py restclient.py $APP_HOME/
+COPY config.py requirements.txt run.py constants.py $APP_HOME/
 COPY monitoring $APP_HOME/monitoring/
-COPY test $APP_HOME/test/
-COPY test/resources $APP_HOME/test/resources/
 COPY configs/*.sh $APP_HOME/bin
 
 RUN chmod 750 $APP_HOME &&\
