@@ -18,19 +18,18 @@
     <div class="video-cards">
       <div
         class="video-player vjs-custom-skin"
-        v-if="data.rtspurl.indexOf('mp4')>-1"
+        v-if="data.subType == 'image'"
       >
-        <video
-          muted
-          loop
-          :id="vidId"
-          width="100%"
-          height="100%"
-        />
+      <img
+        :id="data.name"
+        class="video-cards"
+        :src="data.src"
+      >
+
       </div>
       <div
         class="video-player vjs-custom-skin"
-        v-if="data.rtspurl.indexOf('mp4')<0"
+        v-if="data.subType == 'video'"
       >
         <video
           muted
