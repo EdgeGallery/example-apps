@@ -264,11 +264,15 @@ export default {
         .then(response => {
           if (response.status === 200) {
             response.data.forEach(el => {
+              let rtspurl = el.rtspurl
+              let subType = rtspurl.indexOf('.flv') > -1 ? 'video' : 'image'
               let obj = {
                 name: el.name,
                 type: el.rtspurl.indexOf('mp4') > -1 ? 'video/mp4' : 'rtmp/hls',
+                subType: subType,
                 location: el.location,
-                src: el.rtspurl.indexOf('mp4') > -1 ? baseUrl.baseUrl + `cameras/${el.name}` : el.rtspurl,
+                // src: el.rtspurl.indexOf('mp4') > -1 ? baseUrl.baseUrl + `cameras/${el.name}` : el.rtspurl,
+                src: subType === 'image' ? baseUrl.baseUrl + `cameras/${el.name}` : el.rtspurl,
                 rtspurl: el.rtspurl
               }
               this.cameraList.push(obj)
