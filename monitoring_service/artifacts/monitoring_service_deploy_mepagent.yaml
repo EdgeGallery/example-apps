@@ -24,7 +24,7 @@ metadata:
 spec:
   containers:
   - name: monitoring-be-service-32115-deployment
-    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-be-service:latest
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/monitoring-be-service:v2.0'
     imagePullPolicy: IfNotPresent
     ports:
       - containerPort: 9997
@@ -35,10 +35,12 @@ spec:
         value: "monitoring-proxy-service-32117:5000"
       - name: MEP_AGENT
         value: 127.0.0.1:8080
+      - name: API_GATEWAY
+        value: 'face-recognition.default:9999'
    {{- if .Values.global.mepagent.enabled }}
   - name: mep-agent
-    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/mep-agent:latest
-    imagePullPolicy: Always
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mep-agent:latest'
+    imagePullPolicy: IfNotPresent
     env:
       - name: ENABLE_WAIT
         value: "true"
@@ -53,17 +55,17 @@ spec:
       - name: AK
         valueFrom:
           secretKeyRef:
-            name: {{ .Values.appconfig.aksk.secretname }}
+            name: '{{ .Values.appconfig.aksk.secretname }}'
             key: accesskey
       - name: SK
         valueFrom:
           secretKeyRef:
-            name: {{ .Values.appconfig.aksk.secretname }}
+            name: '{{ .Values.appconfig.aksk.secretname }}'
             key: secretkey
       - name: APPINSTID
         valueFrom:
           secretKeyRef:
-            name: {{ .Values.appconfig.aksk.secretname }}
+            name: '{{ .Values.appconfig.aksk.secretname }}'
             key: appInsId
     volumeMounts:
       - name: mep-agent-service-config-volume
@@ -73,7 +75,7 @@ spec:
   volumes:
     - name: mep-agent-service-config-volume
       configMap:
-        name: {{ .Values.global.mepagent.configmapname }}   
+        name: '{{ .Values.global.mepagent.configmapname }}'   
   {{- end }}
 ---
 apiVersion: v1
@@ -103,7 +105,7 @@ metadata:
 spec:
   containers:
   - name: monitoring-fe-service-32116-deployment
-    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-fe-service:latest
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/monitoring-fe-service:v2.0'
     imagePullPolicy: IfNotPresent
     ports:
       - containerPort: 8080
@@ -133,7 +135,7 @@ metadata:
 spec:
   containers:
   - name: monitoring-proxy-service-32117-deployment
-    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/monitoring-proxy-service:latest
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/monitoring-proxy-service:v2.0'
     imagePullPolicy: IfNotPresent
     ports:
       - containerPort: 5000
