@@ -75,7 +75,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 9998
+    - port: 9999
       targetPort: 9999
       name: face-recognition  
       nodePort: 32111  
