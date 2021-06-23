@@ -265,12 +265,14 @@ class RecognitionThread(threading.Thread):
                 body = cv2.imencode(".jpg", rgb_small_frame)[1].tobytes()
                 rest_client = CLIENT_FACTORY.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
                 url = rest_client.get_endpoint() + "/v1/face-recognition/recognition"
+                app.logger.info(url)
                 response = rest_client.post(url, body)
                 app.logger.info("face-recognition response:" + response.text)
                 data = json.loads(response.text)
-
+                app.logger.info(response.text)
                 for info in data:
                   name = info['Name']
+                  app.logger.info("face_name:" + name)
                   send_notification_msg(self.camera_name, name)
 
 
