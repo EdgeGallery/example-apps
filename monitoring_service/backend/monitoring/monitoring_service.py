@@ -227,7 +227,7 @@ class RecognitionThread(threading.Thread):
                     # video_obj.delete()
                     app.logger.info('listOfVideos remover.before:' + str(len(listOfVideos)))
                     try:
-                      listOfVideos.remove(video_obj)
+                      listOfVideos.remove(video)
                     except Exception as e:
                         app.logger.info('listOfVideos remover.exception:' + str(e))
                     else:
@@ -245,6 +245,7 @@ class RecognitionThread(threading.Thread):
                 self.video.stoped()
                 self.deleteListOfVideos()
                 app.logger.info("Timeout exceptin thread exit:" + self.name)
+                break
             else:
                 small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
                 # Convert the image from BGR color  to RGB color            
