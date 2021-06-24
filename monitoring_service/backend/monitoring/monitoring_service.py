@@ -247,7 +247,7 @@ class RecognitionThread(threading.Thread):
                     # video_obj.delete()
                     app.logger.info('listOfVideos remover.before:' + str(len(listOfVideos)))
                     try:
-                      listOfVideos.remove(video_obj)
+                      listOfVideos.remove(video)
                     except Exception as e:
                         app.logger.info('listOfVideos remover.exception:' + str(e))
                     else:
