@@ -234,6 +234,9 @@ class RecognitionThread(threading.Thread):
         self.camera_name = name
         
     def putFrame(self, frame):
+        if self.queue.qsize() > 50:
+            app.logger.info('the queue size is:' + str(self.queue.qsize())+','+self.camera_name)
+            self.queue.get()
         self.queue.put(frame)
     
     def deleteListOfVideos(self):
@@ -243,8 +246,12 @@ class RecognitionThread(threading.Thread):
                 if video_obj is self.video:
                     # video_obj.delete()
                     app.logger.info('listOfVideos remover.before:' + str(len(listOfVideos)))
-                    listOfVideos.remove(video_obj)
-                    app.logger.info('listOfVideos remover.after:' + str(len(listOfVideos)))
+                    try:
+                      listOfVideos.remove(video_obj)
+                    except Exception as e:
+                        app.logger.info('listOfVideos remover.exception:' + str(e))
+                    else:
+                      app.logger.info('listOfVideos remover.after:' + str(len(listOfVideos)))
                     break
                 
         self.video.delete()
