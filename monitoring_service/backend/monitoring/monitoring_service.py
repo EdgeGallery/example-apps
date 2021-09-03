@@ -35,6 +35,8 @@ import config
 import constants
 import clientsdk
 import queue
+import socket
+
 
 app = Flask(__name__)
 CORS(app)
@@ -52,6 +54,7 @@ listOfVideos = []
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
 listOfServices = ["face-recognition"]
+appid = config.APP_INST_ID
 
 
 class VideoCamera(object):
@@ -360,6 +363,35 @@ def upload_video():
     return Response("success")
 
 
+"""
+Callback url
+"""
+
+def confirm_termination():
+    time.sleep(1)
+    app.logger.info("confirm_termination called")
+    body = {
+        "operationAction": "TERMINATING"
+    }
+    rest_client = CLIENT_FACTORY.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
+    url = "https://"  + config.MEP_IP + ":" + config.MEP_PORT + "/mep/mec_app_support/v1/applications/{0}/confirm_termination".format(
+            config.APP_INST_ID)
+    response = rest_client.post(url, json.dumps(body))
+
+    if response.status_code == 204:
+        logging.info("status code is 204, success")
+    else:
+        logging.info("Error on termination, hence exiting")
+
+    logging.info("confirm_termination response is:" + response.text)
+
+@app.route('/mep/mec_app_support/v1/applications/<appid>/callback', methods=['POST'])
+def is_cleanup(appid):
+    app.logger.info("cleanup called")
+    thread = threading.Thread(target=confirm_termination, args=())
+    thread.start()
+    return Response("OK")
+
 @app.route('/v1/monitor/cameras', methods=['POST'])
 def add_camera():
     """
@@ -600,6 +632,53 @@ def start_server(handler):
     app.logger.addHandler(handler)
     global CLIENT_FACTORY
     CLIENT_FACTORY = clientsdk.ClientFactory(listOfServices)
+    """
+        Checking confirm ready return code is 204 print response for debugging purpose
+    """
+    body = {
+        "indication": "READY"
+    }
+    rest_client = CLIENT_FACTORY.get_client_by_service_name(constants.FACE_RECOGNITION_SERVICE)
+    url = "https://" + config.MEP_IP + ":" + config.MEP_PORT + "/mep/mec_app_support/v1/applications/{0}/confirm_ready".format(
+        config.APP_INST_ID)
+
+    status = True
+    while status:
+        response = rest_client.post(url, json.dumps(body))
+        if response.status_code == 409:
+            app.logger.info("Status code is not 204, entering sleep for 5 seconds")
+            time.sleep(5)
+            continue
+        if response.status_code == 204:
+            app.logger.info("response status code is 204 from mep, success")
+            status = False
+        else:
+            app.logger.info("Error on confirm_ready, hence exiting")
+            status = False
+
+            app.logger.info("Confirm_ready response is:" + response.text)
+
+    """
+        Registration termination event subscription
+    """
+    body = {
+        "subscriptionType": "AppTerminationNotificationSubscription",
+        "callbackReference": "http://" + socket.gethostbyname(socket.gethostname()) + ":" + str(
+            config.MONITORING_SERVICE_BE_PORT) + "/mep/mec_app_support/v1/applications/{0}/callback".format(
+            config.APP_INST_ID),
+        "appInstanceId": config.APP_INST_ID
+    }
+    url = "https://" + config.MEP_IP + ":" + config.MEP_PORT + "/mep/mec_app_support/v1/applications/{0}/subscriptions".format(
+        config.APP_INST_ID)
+
+    response = rest_client.post(url, json.dumps(body))
+    if response.status_code == 201:
+        app.logger.info("status code is 201, success")
+    else:
+        app.logger.info("Error on subscriptions, hence exiting")
+
+        app.logger.info("subscriptions response is:" + response.text)
+
     if config.SSL_ENABLED:
         context = (config.SSL_CERTFILEPATH, config.SSL_KEYFILEPATH)
         app.run(host=config.SERVER_ADDRESS, debug=True,

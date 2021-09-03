@@ -19,6 +19,7 @@ Implementation of rest client
 """
 import os
 import requests
+import config
 
 HTTP_URL = "http://"
 HTTPS_URL = "https://"
@@ -60,7 +61,7 @@ class RestClient:
         """
         access_token = get_access_token()
         access_token = "Bearer " + access_token
-        headers = {'Authorization': access_token}
+        headers = {'Authorization': access_token, 'X-AppinstanceID': config.APP_INST_ID}
         response = requests.post(url, data=body, files=upload_files,
                                  headers=headers, verify=False)
         return response
