@@ -37,6 +37,11 @@ spec:
         value: 127.0.0.1:8080
       - name: API_GATEWAY
         value: 'face-recognition.default:9999'
+      - name: APPINSTID
+        valueFrom:
+          secretKeyRef:
+            name: '{{ .Values.appconfig.aksk.secretname }}'
+            key: appInsId
    {{- if .Values.global.mepagent.enabled }}
   - name: mep-agent
     image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mep-agent:latest'
