@@ -22,6 +22,7 @@ import os
 # [Server Configurations]
 SERVER_PORT = 9997
 SERVER_ADDRESS = os.environ.get('LISTEN_IP', "127.0.0.1")
+MONITORING_SERVICE_BE_PORT = 32120
 
 # [SSL Configurations]
 SSL_ENABLED = False
@@ -38,3 +39,6 @@ API_GATEWAY = os.environ.get("API_GATEWAY", "face-recognition:9999")
 FACE_RECOGNITION = os.environ.get("FACE_RECOGNITION", "facerecognition")
 MEP_AGENT = os.environ.get("MEP_AGENT", "edgegallery.org")
 FE_SERVICE = os.environ.get("FE_SERVICE", "monitoring-proxy-service:5000")
+APP_INST_ID = os.environ.get("APPINSTID", "5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f")
+MEP_IP = os.environ.get("MEP_IP", "mep-mm5.mep")
+MEP_PORT = os.environ.get("MEP_PORT", "80")
