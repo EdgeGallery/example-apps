@@ -7,7 +7,7 @@ metadata:
 spec:
   storageClassName: standard
   capacity:
-    storage: 200Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -24,7 +24,7 @@ spec:
   storageClassName: standard
   resources:
     requests:
-      storage: 200Gi
+      storage: 2Gi
 ---
 apiVersion: v1
 kind: Pod
@@ -35,7 +35,7 @@ metadata:
 spec:
   containers:
   - name: face-recognition-app
-    image: face_recognition_app:v1.4
+    image: swr.ap-southeast-1.myhuaweicloud.com/edgegallery/face_recognition_app:v1.5
     imagePullPolicy: IfNotPresent
     ports:
     - containerPort: 9999
