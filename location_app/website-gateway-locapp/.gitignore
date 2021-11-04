@@ -1,0 +1,20 @@
+target/
+static/
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+*.log
+log/
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.exe
+*.iml
