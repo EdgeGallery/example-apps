@@ -1,0 +1,26 @@
+server:
+  port: 31580
+  ssl:
+    enabled: false
+    protocol: TLS
+    enabled-protocols: [TLSv1.2]
+    ciphers: [TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+              TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384]
+  servlet:
+    session:
+      timeout: 3600
+      cookie:
+        name: ${COOKIE_NAME:JSESSIONID}
+
+spring:
+  servlet:
+    multipart:
+      file-size-threshold: 1MB
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+APPLICATION_ID: edgegallery-locationapp
+service_description:
+  name: website-gateway-locationapp
+  version: 1.0.0
+  environment: development
