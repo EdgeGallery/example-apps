@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booksonic
+  namespace: default
+  labels:
+    app: booksonic
+spec:
+  selector:
+    matchLabels:
+      app: booksonic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: booksonic
+    spec:
+      containers:
+        - name: booksonic
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/booksonic:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4040
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+            - name: CONTEXT_PATH
+              value: "url-base"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booksonic-svc
+  namespace: default
+  labels:
+    svc: booksonic-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 4040
+      name: function1
+      targetPort: 4040
+      protocol: TCP
+      nodePort: 32613
+  selector:
+    app: booksonic
+

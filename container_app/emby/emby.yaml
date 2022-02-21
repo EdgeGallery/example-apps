@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emby
+  namespace: default
+  labels:
+    app: emby
+spec:
+  selector:
+    matchLabels:
+      app: emby
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: emby
+    spec:
+      containers:
+        - name: emby
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/emby:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8096
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emby-svc
+  namespace: default
+  labels:
+    svc: emby-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8096
+      name: webui
+      targetPort: 8096
+      protocol: TCP
+      nodePort: 32618
+  selector:
+    app: emby
+

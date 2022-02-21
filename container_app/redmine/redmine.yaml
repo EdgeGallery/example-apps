@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redmine-db
+spec:
+  replicas: 1
+  selector:
+    app: redmine-db
+  template:
+    metadata:
+      labels:
+        app: redmine-db
+    spec:
+      containers:
+      - name: redmine-db
+        image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mysql:5.6'
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "123456"
+        - name: MYSQL_DATABASE
+          value: redmine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redmine-db
+  labels:
+    svc: redmine-db
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: redmine-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redmine
+  namespace: default
+  labels:
+    app: redmine
+spec:
+  selector:
+    matchLabels:
+      app: redmine
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redmine
+    spec:
+      containers:
+        - name: redmine
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/redmine:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: REDMINE_DB_MYSQL
+              value: redmine-db
+            - name: REDMINE_DB_PASSWORD
+              value: "123456"
+            - name: REDMINE_SECRET_KEY_BASE
+              value: supersecretkey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redmine-svc
+  namespace: default
+  labels:
+    svc: redmine-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      name: function1
+      targetPort: 3000
+      protocol: TCP
+      nodePort: 32690
+  selector:
+    app: redmine
+

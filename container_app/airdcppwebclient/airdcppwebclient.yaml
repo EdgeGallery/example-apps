@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airdcpp-webclient
+  namespace: default
+  labels:
+    app: airdcpp-webclient
+spec:
+  selector:
+    matchLabels:
+      app: airdcpp-webclient
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: airdcpp-webclient
+    spec:
+      containers:
+        - name: airdcpp-webclient
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/airdcpp-webclient:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5600
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airdcpp-webclient-svc
+  namespace: default
+  labels:
+    svc: airdcpp-webclient-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 5600
+      name: function1
+      targetPort: 5600
+      protocol: TCP
+      nodePort: 32574
+  selector:
+    app: airdcpp-webclient
+

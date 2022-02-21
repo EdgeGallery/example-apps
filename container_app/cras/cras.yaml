@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cras
+  namespace: default
+  labels:
+    app: cras
+spec:
+  selector:
+    matchLabels:
+      app: cras
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cras
+    spec:
+      containers:
+        - name: cras
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/cras:latest'
+          securityContext:
+            privileged: true
+          command: ["/usr/sbin/init"]
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cras-svc
+  namespace: default
+  labels:
+    svc: cras-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 443
+      name: function1
+      targetPort: 443
+      protocol: TCP
+      nodePort: 32696
+  selector:
+    app: cras
+

@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: papermerge
+  namespace: default
+  labels:
+    app: papermerge
+spec:
+  selector:
+    matchLabels:
+      app: papermerge
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: papermerge
+    spec:
+      containers:
+        - name: papermerge
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/papermerge:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/New_York"
+            - name: REDIS_URL
+              value: "`#optional`"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: papermerge-svc
+  namespace: default
+  labels:
+    svc: papermerge-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      name: papermergeweb
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 32611
+  selector:
+    app: papermerge

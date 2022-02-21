@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcsaeanalysis
+  namespace: default
+  labels:
+    app: tcsaeanalysis
+spec:
+  selector:
+    matchLabels:
+      app: tcsaeanalysis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tcsaeanalysis
+    spec:
+      containers:
+        - name: tcsaeanalysis
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/tcsae-analysis:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcsaeanalysis-svc
+  namespace: default
+  labels:
+    svc: tcsaeanalysis-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8083
+      name: function1
+      targetPort: 8083
+      protocol: TCP
+      nodePort: 32766
+  selector:
+    app: tcsaeanalysis

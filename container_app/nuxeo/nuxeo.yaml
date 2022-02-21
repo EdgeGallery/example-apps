@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mynuxeo
+  namespace: default
+  labels:
+    app: mynuxeo
+spec:
+  selector:
+    matchLabels:
+      app: mynuxeo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mynuxeo
+    spec:
+      containers:
+        - name: mynuxeo
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/nuxeo:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NUXEO_PACKAGES
+              value: "nuxeo-web-ui nuxeo-jsf-ui"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mynuxeo-svc
+  namespace: default
+  labels:
+    svc: mynuxeo-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      name: function1
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32698
+  selector:
+    app: mynuxeo
+

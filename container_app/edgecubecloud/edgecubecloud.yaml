@@ -1,0 +1,386 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jetlinks-ce-redis
+  namespace: default
+  labels:
+    app: jetlinks-ce-redis
+spec:
+  selector:
+    matchLabels:
+      app: jetlinks-ce-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jetlinks-ce-redis
+    spec:
+      containers:
+        - name: jetlinks-ce-redis
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/redis:5.0.4'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+          args:
+            - redis-server
+            - --appendonly
+            - "yes"
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetlinks-ce-redis
+  namespace: default
+  labels:
+    svc: jetlinks-ce-redis
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+  selector:
+    app: jetlinks-ce-redis
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: default
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/elasticsearch:6.8.11'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+          env:
+            - name: ES_JAVA_OPTS
+              value: -Djava.net.preferIPv4Stack=true -Xms1g -Xmx1g
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: discovery.type
+              value: single-node
+            - name: discovery.zen.minimum_master_nodes
+              value: "1"
+            - name: discovery.zen.ping.unicast.hosts
+              value: elasticsearch
+            - name: transport.host
+              value: 0.0.0.0
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: default
+  labels:
+    svc: elasticsearch
+spec:
+  ports:
+    - port: 9200
+      targetPort: 9200
+      protocol: TCP
+  selector:
+    app: elasticsearch
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: default
+  labels:
+    app: kibana
+spec:
+  selector:
+    matchLabels:
+      app: kibana
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/kibana:6.8.11'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5601
+          env:
+            - name: ELASTICSEARCH_URL
+              value: http://elasticsearch:9200
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetlinks-ce-kibana
+  namespace: default
+  labels:
+    svc: kibana
+spec:
+  ports:
+    - port: 5601
+      targetPort: 5601
+      protocol: TCP
+  selector:
+    app: kibana
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jetlinks-ce-postgres
+  namespace: default
+  labels:
+    app: jetlinks-ce-postgres
+spec:
+  selector:
+    matchLabels:
+      app: jetlinks-ce-postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jetlinks-ce-postgres
+    spec:
+      containers:
+        - image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/postgres:11-alpine'
+          name: jetlinks-ce-postgres
+          ports:
+          - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: jetlinks
+            - name: POSTGRES_PASSWORD
+              value: jetlinks
+            - name: TZ
+              value: Asia/Shanghai     
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetlinks-ce-postgres
+  namespace: default
+  labels:
+    svc: jetlinks-ce-postgres
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: jetlinks-ce-postgres
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jetlinks-ce-ui
+  namespace: default
+  labels:
+    app: jetlinks-ce-ui
+spec:
+  selector:
+    matchLabels:
+      app: jetlinks-ce-ui
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jetlinks-ce-ui
+    spec:
+      containers:
+        - name: jetlinks-ce-ui
+          env:
+            - name: API_BASE_PATH
+              value: http://jetlinks-ce:8848/
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/jetlinks-ui-antd:1.8.0'
+          ports:
+          - containerPort: 80        
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetlinks-ce-ui
+  namespace: default
+  labels:
+    svc: jetlinks-ce-ui
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32680
+  selector:
+    app: jetlinks-ce-ui
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jetlinks-ce
+  namespace: default
+  labels:
+    app: jetlinks-ce
+spec:
+  selector:
+    matchLabels:
+      app: jetlinks-ce
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jetlinks-ce
+    spec:
+      containers:
+        - name: jetlinks-ce
+          env:
+          - name: TZ
+            value: Asia/Shanghai
+          - name: elasticsearch.client.host
+            value: elasticsearch
+          - name: elasticsearch.client.post
+            value: "9200"
+          - name: hsweb.file.upload.static-location
+            value: http://127.0.0.1:8848/upload
+          - name: logging.level.io.r2dbc
+            value: warn
+          - name: logging.level.org.hswebframework
+            value: warn
+          - name: logging.level.org.jetlinks
+            value: warn
+          - name: logging.level.org.springframework
+            value: warn
+          - name: logging.level.org.springframework.data
+            value: warn
+          - name: logging.level.org.springframework.data.r2dbc.connectionfactory
+            value: warn
+          - name: spring.r2dbc.password
+            value: jetlinks
+          - name: spring.r2dbc.url
+            value: r2dbc:postgresql://jetlinks-ce-postgres:5432/jetlinks
+          - name: spring.r2dbc.username
+            value: postgres
+          - name: spring.redis.host
+            value: jetlinks-ce-redis
+          - name: spring.redis.port
+            value: "6379"
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/jetlinks-standalone:1.8.0-SNAPSHOT'
+          ports:
+          - containerPort: 8848
+          - containerPort: 1883
+          - containerPort: 1884
+          - containerPort: 1885
+          - containerPort: 1886
+          - containerPort: 1887
+          - containerPort: 1888
+          - containerPort: 1889
+          - containerPort: 1890
+          - containerPort: 8000
+          - containerPort: 8001
+          - containerPort: 8002
+          - containerPort: 8003
+          - containerPort: 8004
+          - containerPort: 8005
+          - containerPort: 8006
+          - containerPort: 8007
+          - containerPort: 8008
+          - containerPort: 8009
+          - containerPort: 8010
+               
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetlinks-ce
+  namespace: default
+  labels:
+    svc: jetlinks-ce
+spec:
+  ports:
+    - name: "8848"
+      port: 8848
+      targetPort: 8848
+    - name: "1883"
+      port: 1883
+      targetPort: 1883
+    - name: "1884"
+      port: 1884
+      targetPort: 1884
+    - name: "1885"
+      port: 1885
+      targetPort: 1885
+    - name: "1886"
+      port: 1886
+      targetPort: 1886
+    - name: "1887"
+      port: 1887
+      targetPort: 1887
+    - name: "1888"
+      port: 1888
+      targetPort: 1888
+    - name: "1889"
+      port: 1889
+      targetPort: 1889
+    - name: "1890"
+      port: 1890
+      targetPort: 1890
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+    - name: "8001"
+      port: 8001
+      targetPort: 8001
+    - name: "8002"
+      port: 8002
+      targetPort: 8002
+    - name: "8003"
+      port: 8003
+      targetPort: 8003
+    - name: "8004"
+      port: 8004
+      targetPort: 8004
+    - name: "8005"
+      port: 8005
+      targetPort: 8005
+    - name: "8006"
+      port: 8006
+      targetPort: 8006
+    - name: "8007"
+      port: 8007
+      targetPort: 8007
+    - name: "8008"
+      port: 8008
+      targetPort: 8008
+    - name: "8009"
+      port: 8009
+      targetPort: 8009
+    - name: "8010"
+      port: 8010
+      targetPort: 8010
+  selector:
+    app: jetlinks-ce

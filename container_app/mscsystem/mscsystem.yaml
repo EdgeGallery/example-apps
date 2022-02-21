@@ -1,0 +1,113 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msc-rtmp
+  namespace: default
+  labels:
+    app: msc-rtmp
+spec:
+  selector:
+    matchLabels:
+      app: msc-rtmp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: msc-rtmp
+    spec:
+      containers:
+        - name: msc-rtmp
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/msc:latest'
+          imagePullPolicy: IfNotPresent
+          command: 
+          command: ['sh', '-c', "/opt/server/run.sh"]
+          ports:
+            - containerPort: 80
+            - containerPort: 1935
+            - containerPort: 5000
+            - containerPort: 1883
+          volumeMounts:
+            - mountPath: /opt/test/conf.ini
+              name: msc-rtmp-ini
+            - mountPath: /opt/test/rtmp.conf
+              name: msc-rtmp-conf
+      volumes:
+        - name: msc-rtmp-ini
+          configMap:
+            name: msc-rtmp-ini-configmap
+        - name: msc-rtmp-conf
+          configMap:
+            name: msc-rtmp-conf-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: msc-rtmp-svc
+  namespace: default
+  labels:
+    svc: msc-rtmp-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: func
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32740
+    - port: 1935
+      name: function
+      targetPort: 1935
+      protocol: TCP
+      nodePort: 32737
+    - port: 5000
+      name: function1
+      targetPort: 5000
+      protocol: TCP
+      nodePort: 32738
+    - port: 1883
+      name: function2
+      targetPort: 1883
+      protocol: TCP
+      nodePort: 32739
+  selector:
+    app: msc-rtmp
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: msc-rtmp-conf-configmap
+data:
+  rtmp.conf: |
+    listen              1935;
+    max_connections     1000;
+    daemon              off
+    srs_log_tank        console;
+    vhost __defaultVhost__ {
+      http_hooks {
+            enabled         on;
+      }
+    }
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: msc-rtmp-ini-configmap
+data:
+  conf.ini: |
+    [mysql]
+    sqlPath=mysql://user:password@192.168.101.189:3306/python
+    host=192.168.101.189
+    user=user
+    password=password
+    database=python
+    
+    
+    [mqtt]
+    url=192.168.101.189
+    port=1883
+

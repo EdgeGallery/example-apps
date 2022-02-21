@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: face-detection
+  namespace: default
+  labels:
+    app: face-detection
+spec:
+  selector:
+    matchLabels:
+      app: face-detection
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: face-detection
+    spec:
+      containers:
+        - name: face-detection
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/facedetection:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: face-detection-svc
+  namespace: default
+  labels:
+    svc: face-detection-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8002
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31662
+  selector:
+    app: face-detection
+

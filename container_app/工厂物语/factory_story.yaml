@@ -1,0 +1,475 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scp-nacos
+  namespace: default
+  labels:
+    app: scp-nacos
+spec:
+  selector:
+    matchLabels:
+      app: scp-nacos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scp-nacos
+    spec:
+      containers:
+        - name: scp-nacos
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:scp-nacos0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8848
+      imagePullSecrets:
+      - name: arsight-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scp-nacos
+  namespace: default
+  labels:
+    svc: scp-nacos
+spec:
+  ports:
+    - port: 8848
+      targetPort: 8848
+      protocol: TCP
+  selector:
+    app: scp-nacos
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scp-mysql
+  namespace: default
+  labels:
+    app: scp-mysql
+spec:
+  selector:
+    matchLabels:
+      app: scp-mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scp-mysql
+    spec:
+      containers:
+        - name: scp-mysql
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:scp-mysql0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-volume
+      imagePullSecrets:
+        - name: arsight-secret
+      restartPolicy: Always
+      volumes:
+        - name: mysql-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scp-mysql
+  namespace: default
+  labels:
+    svc: scp-mysql
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: scp-mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scp-redis
+  namespace: default
+  labels:
+    app: scp-redis
+spec:
+  selector:
+    matchLabels:
+      app: scp-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scp-redis
+    spec:
+      containers:
+        - name: scp-redis
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:scp-redis0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+      imagePullSecrets:
+      - name: arsight-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scp-redis
+  namespace: default
+  labels:
+    svc: scp-redis
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+  selector:
+    app: scp-redis
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scp-dca
+  namespace: default
+  labels:
+    app: scp-dca
+spec:
+  selector:
+    matchLabels:
+      app: scp-dca
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scp-dca
+    spec:
+      containers:
+        - name: scp-dca
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:scp-dca0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scp-dca
+  namespace: default
+  labels:
+    svc: scp-dca
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: scp-dca
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tms-center
+  namespace: default
+  labels:
+    app: tms-center
+spec:
+  selector:
+    matchLabels:
+      app: tms-center
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tms-center
+    spec:
+      containers:
+        - name: tms-center
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:tms-center0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7400
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tms-center
+  namespace: default
+  labels:
+    svc: tms-center
+spec:
+  ports:
+    - port: 7400
+      targetPort: 7400
+      protocol: TCP
+  selector:
+    app: tms-center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oms-center
+  namespace: default
+  labels:
+    app: oms-center
+spec:
+  selector:
+    matchLabels:
+      app: oms-center
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: oms-center
+    spec:
+      containers:
+        - name: oms-center
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:oms-center0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7500
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oms-center
+  namespace: default
+  labels:
+    svc: oms-center
+spec:
+  ports:
+    - port: 7500
+      targetPort: 7500
+      protocol: TCP
+  selector:
+    app: oms-center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-center
+  namespace: default
+  labels:
+    app: sdm-center
+spec:
+  selector:
+    matchLabels:
+      app: sdm-center
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sdm-center
+    spec:
+      containers:
+        - name: sdm-center
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:sdm-center0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7700
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-center
+  namespace: default
+  labels:
+    svc: sdm-center
+spec:
+  ports:
+    - port: 7700
+      targetPort: 7700
+      protocol: TCP
+  selector:
+    app: sdm-center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ics-center
+  namespace: default
+  labels:
+    app: ics-center
+spec:
+  selector:
+    matchLabels:
+      app: ics-center
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ics-center
+    spec:
+      containers:
+        - name: ics-center
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:ics-center0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7800
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ics-center
+  namespace: default
+  labels:
+    svc: ics-center
+spec:
+  ports:
+    - port: 7800
+      targetPort: 7800
+      protocol: TCP
+  selector:
+    app: ics-center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eam-center
+  namespace: default
+  labels:
+    app: eam-center
+spec:
+  selector:
+    matchLabels:
+      app: eam-center
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: eam-center
+    spec:
+      containers:
+        - name: eam-center
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:eam-center0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7900
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eam-center
+  namespace: default
+  labels:
+    svc: eam-center
+spec:
+  ports:
+    - port: 7900
+      targetPort: 7900
+      protocol: TCP
+  selector:
+    app: eam-center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scp-gateway
+  namespace: default
+  labels:
+    app: scp-gateway
+spec:
+  selector:
+    matchLabels:
+      app: scp-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scp-gateway
+    spec:
+      containers:
+        - name: scp-gateway
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:scp-gateway0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9900
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scp-gateway
+  namespace: default
+  labels:
+    svc: scp-gateway
+spec:
+  type: NodePort
+  ports:
+    - port: 9900
+      targetPort: 9900
+      protocol: TCP
+      nodePort: 32679
+      name: scp-gateway-server
+  selector:
+    app: scp-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scp-web
+  namespace: default
+  labels:
+    app: scp-web
+spec:
+  selector:
+    matchLabels:
+      app: scp-web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scp-web
+    spec:
+      containers:
+        - name: scp-web
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/lingxi:scp-web0.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+      imagePullSecrets:
+      - name: arsight-secret
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scp-web
+  namespace: default
+  labels:
+    svc: scp-web
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32678
+      name: scp-web-server
+  selector:
+    app: scp-web
+
+

@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spiderfoot
+  namespace: default
+  labels:
+    app: spiderfoot
+spec:
+  selector:
+    matchLabels:
+      app: spiderfoot
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spiderfoot
+    spec:
+      containers:
+        - name: spiderfoot
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/spiderfoot:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spiderfoot-svc
+  namespace: default
+  labels:
+    svc: spiderfoot-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 5001
+      name: function1
+      targetPort: 5001
+      protocol: TCP
+      nodePort: 32589
+  selector:
+    app: spiderfoot
+

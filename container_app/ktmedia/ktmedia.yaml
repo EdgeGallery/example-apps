@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kontian-video
+  namespace: default
+  labels:
+    app: kontian-video
+spec:
+  selector:
+    matchLabels:
+      app: kontian-video
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kontian-video
+    spec:
+      containers:
+        - name: kontian-video
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/kongtian:ktmediav2'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+            - containerPort: 8080
+            - containerPort: 554
+            - containerPort: 1935
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kontian-video-svc
+  namespace: default
+  labels:
+    svc: kontian-video-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32667
+      name: server1
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32663
+      name: server4
+    - port: 554
+      targetPort: 554
+      protocol: TCP
+      nodePort: 32668
+      name: server2
+    - port: 1935
+      targetPort: 1935
+      protocol: TCP
+      nodePort: 32669
+      name: server3
+  selector:
+    app: kontian-video

@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dillinger
+  namespace: default
+  labels:
+    app: dillinger
+spec:
+  selector:
+    matchLabels:
+      app: dillinger
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dillinger
+    spec:
+      containers:
+        - name: dillinger
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/dillinger:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dillinger-svc
+  namespace: default
+  labels:
+    svc: dillinger-svc
+    svc: dillinger-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      name: webui
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32633
+  selector:
+    app: dillinger
+

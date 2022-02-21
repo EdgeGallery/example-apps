@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dokuwiki
+  namespace: default
+  labels:
+    app: dokuwiki
+spec:
+  selector:
+    matchLabels:
+      app: dokuwiki
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dokuwiki
+    spec:
+      containers:
+        - name: dokuwiki
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/dokuwiki:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dokuwiki-svc
+  namespace: default
+  labels:
+    svc: dokuwiki-svc
+    svc: dokuwiki-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: webui
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32635
+  selector:
+    app: dokuwiki
+

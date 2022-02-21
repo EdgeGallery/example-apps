@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fawkes-deploy
+  namespace: default
+  labels:
+    app: fawkes-deploy
+spec:
+  selector:
+    matchLabels:
+      app: fawkes-deploy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fawkes-deploy
+    spec:
+      containers:
+        - name: fawkes-deploy
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/fawkes:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fawkes-svc
+  namespace: default
+  labels:
+    svc: fawkes-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8003
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31663
+  selector:
+    app: fawkes-deploy
+

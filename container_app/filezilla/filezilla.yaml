@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filezilla
+  namespace: default
+  labels:
+    app: filezilla
+spec:
+  selector:
+    matchLabels:
+      app: filezilla
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: filezilla
+    spec:
+      containers:
+        - name: filezilla
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/filezilla:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filezilla-svc
+  namespace: default
+  labels:
+    svc: filezilla-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      name: function1
+      targetPort: 3000
+      protocol: TCP
+      nodePort: 32612
+  selector:
+    app: filezilla
+

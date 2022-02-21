@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kontian
+  namespace: default
+  labels:
+    app: kontian
+spec:
+  selector:
+    matchLabels:
+      app: kontian
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kontian
+    spec:
+      containers:
+        - name: kontian
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/kongtian:zfba'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kontian-svc
+  namespace: default
+  labels:
+    svc: kontian-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32665
+      name: server
+  selector:
+    app: kontian

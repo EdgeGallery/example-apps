@@ -1,0 +1,123 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pcb-detection
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: pcb-detection
+spec:
+  selector:
+    matchLabels:
+      app: pcb-detection
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pcb-detection
+    spec:
+      containers:
+        - name: pcb-detection
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/pcbbe_demo:v1.0'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9991
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcb-detection
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: pcb-detection
+spec:
+  type: NodePort
+  ports:
+    - port: 9991
+      targetPort: 9991
+      protocol: TCP
+      nodePort: 31555
+  selector:
+    app: pcb-detection
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pcb-node-proxy
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: pcb-node-proxy
+spec:
+  selector:
+    matchLabels:
+      app: pcb-node-proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pcb-node-proxy
+    spec:
+      containers:
+        - name: pcb-node-proxy
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/pcb-node-proxy:v1.0'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcb-node-proxy
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: pcb-node-proxy
+spec:
+  type: NodePort
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      nodePort: 31556
+  selector:
+    app: pcb-node-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pcb-fe
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: pcb-fe
+spec:
+  selector:
+    matchLabels:
+      app: pcb-fe
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pcb-fe
+    spec:
+      containers:
+        - name: pcb-fe
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/pcb-fe:v1.0'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcb-fe
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: pcb-fe
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 31557
+  selector:
+    app: pcb-fe

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-mqtt
+  namespace: default
+  labels:
+    app: rabbitmq-mqtt
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq-mqtt
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-mqtt
+    spec:
+      containers:
+        - name: rabbitmq-mqtt-demo
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/rabbitmq-mqtt:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http15672
+              protocol: TCP
+              containerPort: 15672
+            - name: tcp5672
+              protocol: TCP
+              containerPort: 5672
+            - name: tcp1883
+              protocol: TCP
+              containerPort: 1883
+            - name: tcp8883
+              protocol: TCP
+              containerPort: 8883
+          securityContext:
+            privileged: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-mqtt
+  namespace: default
+  labels:
+    svc: rabbitmq-mqtt
+spec:
+  type: NodePort
+  ports:
+   - name: http15672
+     protocol: TCP
+     port: 15672
+     targetPort: 15672
+     nodePort: 32692
+   - name: tcp5672
+     protocol: TCP
+     port: 5672
+     targetPort: 5672
+     nodePort: 32693
+   - name: tcp1883
+     protocol: TCP
+     port: 1883
+     targetPort: 1883
+     nodePort: 32694
+   - name: tcp8883
+     protocol: TCP
+     port: 8883
+     targetPort: 8883
+     nodePort: 32695
+  selector:
+    app: rabbitmq-mqtt

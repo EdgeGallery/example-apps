@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: joomla
+  namespace: '{{.Values.appconfig.appnamespace}}'
+  labels:
+    app: joomla
+spec:
+  containers:
+    - name: joomla
+      image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/joomla:latest'
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 80
+      env:
+        - name: JOOMLA_DB_HOST
+          value: joomla-db
+        - name: JOOMLA_DB_PASSWORD
+          value: "123456"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: joomla-db
+  labels:
+    svc: joomla-db
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: joomla-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: joomla-svc
+  namespace: '{{.Values.appconfig.appnamespace}}'
+  labels:
+    svc: joomla-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32689
+  selector:
+    app: joomla
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: joomla-db
+spec:
+  replicas: 1
+  selector:
+    app: joomla-db
+  template:
+    metadata:
+      labels:
+        app: joomla-db
+    spec:
+      containers:
+      - name: joomla-db
+        image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mysql:5.6'
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "123456"

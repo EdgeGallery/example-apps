@@ -1,0 +1,112 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zoon-minder
+  namespace: default
+  labels:
+    app: zoon-minder
+spec:
+  selector:
+    matchLabels:
+      app: zoon-minder
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zoon-minder
+    spec:
+      containers:
+        - name: zoonminder
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/zoneminder:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: ZM_DB_HOST
+              value: zonedb-svc
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: shm
+              mountPath: /dev/shm
+      volumes:
+        - name: shm
+          emptyDir: {
+            medium: 'Memory',
+            sizeLimit: '4096Mi'
+          }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zoon-minder-svc
+  namespace: default
+  labels:
+    svc: zoon-minder-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32040
+  selector:
+    app: zoon-minder
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zoon-minder-db
+  namespace: default
+  labels:
+    app: zoon-minder-db
+spec:
+  selector:
+    matchLabels:
+      app: zoon-minder-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zoon-minder-db
+    spec:
+      containers:
+        - name: zoondb
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mysql-server:5.7'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: MYSQL_USER
+              value: zmuser
+            - name: MYSQL_PASSWORD
+              value: zmpass
+            - name: MYSQL_DATABASE
+              value: zm
+            - name: MYSQL_ROOT_PASSWORD
+              value: mysqlpsswd
+            - name: MYSQL_ROOT_HOST
+              value:  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zonedb-svc
+  namespace: default
+  labels:
+    svc: zonedb-svc
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: zoon-minder-db
+

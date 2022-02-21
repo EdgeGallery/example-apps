@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rtmp
+  namespace: default
+  labels:
+    app: nginx-rtmp
+spec:
+  selector:
+    matchLabels:
+      app: nginx-rtmp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-rtmp
+    spec:
+      containers:
+        - name: nginx-rtmp
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/nginx-rtmp:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1935
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-rtmp-svc
+  namespace: default
+  labels:
+    svc: nginx-rtmp-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 1935
+      name: function
+      targetPort: 1935
+      protocol: TCP
+      nodePort: 32735
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32736
+  selector:
+    app: nginx-rtmp
+
