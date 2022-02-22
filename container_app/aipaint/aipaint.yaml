@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aipaint
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: aipaint
+spec:
+  selector:
+    matchLabels:
+      app: aipaint
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aipaint
+    spec:
+      containers:
+        - name: aipaint
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/aipaint:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+        {{- if .Values.global.mepagent.enabled }}    # 是否依赖平台能力，没有这部分无法使用平台的能力
+        - name: mep-agent
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mep-agent:v1.5.1'
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ENABLE_WAIT
+              value: "true"
+            - name: MEP_IP
+              value: "mep-api-gw.mep"
+            - name: MEP_APIGW_PORT
+              value: "8443"
+            - name: CA_CERT_DOMAIN_NAME
+              value: "edgegallery"
+            - name: CA_CERT
+              value: /usr/mep/ssl/ca.crt
+            - name: AK
+              valueFrom:
+                secretKeyRef:
+                  name: '{{ .Values.appconfig.aksk.secretname }}'
+                  key: accesskey
+            - name: SK
+              valueFrom:
+                secretKeyRef:
+                  name: '{{ .Values.appconfig.aksk.secretname }}'
+                  key: secretkey
+            - name: APPINSTID
+              valueFrom:
+                secretKeyRef:
+                  name: '{{ .Values.appconfig.aksk.secretname }}'
+                  key: appInsId
+          volumeMounts:
+            - name: mep-agent-service-config-volume
+              mountPath: /usr/mep/conf/app_instance_info.yaml
+              subPath: app_instance_info.yaml
+                  
+      volumes:
+        - name: mep-agent-service-config-volume
+          configMap:
+            name: '{{ .Values.global.mepagent.configmapname }}'
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aipaint-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: aipaint-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31656
+  selector:
+    app: aipaint
+

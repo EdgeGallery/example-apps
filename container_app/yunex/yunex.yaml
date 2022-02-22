@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yunex
+  namespace: default
+  labels:
+    app: yunex
+spec:
+  selector:
+    matchLabels:
+      app: yunex
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: yunex
+    spec:
+      containers:
+        - name: yunex
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/yunex:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yunex-svc
+  namespace: default
+  labels:
+    svc: yunex-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 31769
+      protocol: TCP
+  selector:
+    app: yunex

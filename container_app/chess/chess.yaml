@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chess
+  namespace: default
+  labels:
+    app: chess
+spec:
+  selector:
+    matchLabels:
+      app: chess
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: chess
+    spec:
+      containers:
+        - name: chess
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/rmeira-chess:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chess-svc
+  namespace: default
+  labels:
+    svc: chess-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32564
+  selector:
+    app: chess
+

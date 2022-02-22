@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deepemoji
+  namespace: default
+  labels:
+    app: deepemoji
+spec:
+  selector:
+    matchLabels:
+      app: deepemoji
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: deepemoji
+    spec:
+      containers:
+        - name: deepemoji
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/deepemoji:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deepemoji-svc
+  namespace: default
+  labels:
+    svc: deepemoji-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8001
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31651
+  selector:
+    app: deepemoji
+

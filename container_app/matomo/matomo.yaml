@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matomo
+  namespace: default
+  labels:
+    app: matomo
+spec:
+  selector:
+    matchLabels:
+      app: matomo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: matomo
+    spec:
+      containers:
+        - name: matomo
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/matomo:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matomo-svc
+  namespace: default
+  labels:
+    svc: matomo-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32592
+  selector:
+    app: matomo

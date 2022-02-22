@@ -1,0 +1,165 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-proxy
+  labels:
+    helm.sh/chart: model-proxy-0.0.8
+    app.kubernetes.io/name: model-proxy
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    service: model-proxy
+spec:
+  type: ClusterIP
+  ports:
+    - name: model-proxy
+      port: 8660
+    - name: ki-infer-http
+      port: 8000
+    - name: ki-infer-grpc
+      port: 8001
+    - name: ki-infer-metrics
+      port: 8002
+  selector:
+    app.kubernetes.io/name: model-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-proxy-headless
+  labels:
+    helm.sh/chart: model-proxy-0.0.8
+    app.kubernetes.io/name: model-proxy
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    service: model-proxy
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: model-proxy
+      port: 8660
+    - name: ki-infer-http
+      port: 8000
+    - name: ki-infer-grpc
+      port: 8001
+    - name: ki-infer-metrics
+      port: 8002
+  selector:
+    app.kubernetes.io/name: model-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-proxy-mec
+  labels:
+    helm.sh/chart: model-proxy-0.0.8
+    app.kubernetes.io/name: model-proxy
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: model-proxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: model-proxy
+    spec:
+      hostNetwork: false
+      # dnsPolicy: 
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        {}
+      containers:
+        - name: model-proxy
+          securityContext:
+            {}
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/kingsoft:model-proxy-latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8660
+              protocol: TCP
+          volumeMounts:
+            - name: data-dir
+              mountPath: /data/model-proxy-data
+            - name: log-dir
+              mountPath: /data/model-proxy-logs
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          env:
+            - name: MP_TARGET
+              value: "single"
+            - name: MP_BATCH_MODE
+              value: "false"
+          lifecycle:
+            preStop:
+              exec:
+                command: ['killall', '-s', 'SIGTERM', 'model-proxy']
+        - name: ki-infer
+          securityContext:
+            {}
+          imagePullPolicy: IfNotPresent
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/kingsoft:ki-infer-cpu-latest'
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "/usr/bin/python3"
+                  - "/data/model-repo/is-model-store-cpu_4024df8e26254a78167ca230ff49808dbd0217d9/model_eval/eval_model.py"
+                  - "--sleep"
+                  - "20"
+          ports:
+            - containerPort: 8000
+              name: http-port
+              protocol: TCP
+            - containerPort: 8001
+              name: grpc-port
+              protocol: TCP
+            - containerPort: 8002
+              name: metrics-port
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: log-dir
+              mountPath: /data/logs
+          env:
+            - name: MODEL_STORE
+              value: is-model-store-cpu_4024df8e26254a78167ca230ff49808dbd0217d9
+            - name: KI_INFER_LOG_LEVEL
+              value: WARN
+          resources:
+            limits:
+              memory: "10Gi"
+              cpu: "7"
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+      volumes:
+        - name: data-dir
+          emptyDir: {}
+        - name: log-dir
+          hostPath:
+            path: /data/logs
+            type: DirectoryOrCreate

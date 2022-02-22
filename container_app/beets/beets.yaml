@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beets
+  namespace: default
+  labels:
+    app: beets
+spec:
+  selector:
+    matchLabels:
+      app: beets
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: beets
+    spec:
+      containers:
+        - name: beets
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/beets:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8337
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beets-svc
+  namespace: default
+  labels:
+    svc: beets-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8337
+      name: webui
+      targetPort: 8337
+      protocol: TCP
+      nodePort: 32619
+  selector:
+    app: beets
+

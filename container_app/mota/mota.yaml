@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mota
+  namespace: default
+  labels:
+    app: mota
+spec:
+  selector:
+    matchLabels:
+      app: mota
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mota
+    spec:
+      containers:
+        - name: mota
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mota:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mota-svc
+  namespace: default
+  labels:
+    svc: mota-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32583
+  selector:
+    app: mota
+

@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fighter
+  namespace: default
+  labels:
+    app: fighter
+spec:
+  selector:
+    matchLabels:
+      app: fighter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fighter
+    spec:
+      containers:
+        - name: fighter
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/fighter:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fighter-svc
+  namespace: default
+  labels:
+    svc: fighter-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32586
+  selector:
+    app: fighter
+

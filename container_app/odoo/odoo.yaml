@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: odoo-db
+spec:
+  replicas: 1
+  selector:
+    app: odoo-db
+  template:
+    metadata:
+      labels:
+        app: odoo-db
+    spec:
+      containers:
+      - name: odoo-db
+        image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/postgres:10'
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: odoo
+        - name: POSTGRES_PASSWORD
+          value: odoo
+        - name: POSTGRES_DB
+          value: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: odoo-db
+  labels:
+    svc: odoo-db
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: odoo-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odoo
+  namespace: default
+  labels:
+    app: odoo
+spec:
+  selector:
+    matchLabels:
+      app: odoo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: odoo
+    spec:
+      containers:
+        - name: odoo
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/odoo:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8069
+          env:
+            - name: HOST
+              value: odoo-db
+            - name: USER
+              value: odoo
+            - name: PASSWORD
+              value: odoo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: odoo-svc
+  namespace: default
+  labels:
+    svc: odoo-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8069
+      name: function1
+      targetPort: 8069
+      protocol: TCP
+      nodePort: 32690
+  selector:
+    app: odoo

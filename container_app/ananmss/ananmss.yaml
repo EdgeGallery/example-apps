@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anan-mss
+  namespace: default
+  labels:
+    app: anan-mss
+spec:
+  selector:
+    matchLabels:
+      app: anan-mss
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: anan-mss
+    spec:
+      containers:
+        - name: mss
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/anan:mss-v1.0'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 554
+            - containerPort: 10008
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anan-mss-svc
+  namespace: default
+  labels:
+    svc: anan-mss
+spec:
+  type: NodePort
+  ports:
+    - port: 554
+      name: msstcp
+      targetPort: 554
+      protocol: TCP
+      nodePort: 32071
+    - port: 554
+      name: mssudp
+      targetPort: 554
+      protocol: UDP
+      nodePort: 32071
+    - port: 10008
+      name: msstcp2
+      targetPort: 10008
+      protocol: TCP
+      nodePort: 32072
+  selector:
+    app: anan-mss
+

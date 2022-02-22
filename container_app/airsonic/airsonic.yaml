@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airsonic
+  namespace: default
+  labels:
+    app: airsonic
+spec:
+  selector:
+    matchLabels:
+      app: airsonic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: airsonic
+    spec:
+      containers:
+        - name: airsonic
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/airsonic:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4040
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airsonic-svc
+  namespace: default
+  labels:
+    svc: airsonic-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 4040
+      name: function1
+      targetPort: 4040
+      protocol: TCP
+      nodePort: 32572
+  selector:
+    app: airsonic
+

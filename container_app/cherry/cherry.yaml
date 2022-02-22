@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cherry
+  namespace: default
+  labels:
+    app: cherry
+spec:
+  selector:
+    matchLabels:
+      app: cherry
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cherry
+    spec:
+      containers:
+        - name: cherry
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/cherry:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cherry-svc
+  namespace: default
+  labels:
+    svc: cherry-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31655
+  selector:
+    app: cherry
+

@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: darktable
+  namespace: default
+  labels:
+    app: darktable
+spec:
+  selector:
+    matchLabels:
+      app: darktable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: darktable
+    spec:
+      containers:
+        - name: darktable
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/darktable:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: darktable-svc
+  namespace: default
+  labels:
+    svc: darktable-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      name: webui
+      targetPort: 3000
+      protocol: TCP
+      nodePort: 32619
+  selector:
+    app: darktable
+

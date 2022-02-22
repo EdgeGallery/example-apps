@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plone
+  namespace: default
+  labels:
+    app: plone
+spec:
+  selector:
+    matchLabels:
+      app: plone
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: plone
+    spec:
+      containers:
+        - name: plone
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/plone:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plone-svc
+  namespace: default
+  labels:
+    svc: plone-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      name: function1
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32706
+  selector:
+    app: plone

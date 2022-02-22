@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: avatarify
+  namespace: default
+  labels:
+    app: avatarify
+spec:
+  selector:
+    matchLabels:
+      app: avatarify
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: avatarify
+    spec:
+      containers:
+        - name: avatarify
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/avatarify-worker:7.12.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5557
+            - containerPort: 5558
+        - name: spark-recommender
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/avatarify:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: avatarify-svc
+  namespace: default
+  labels:
+    svc: avatarify-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31661
+  selector:
+    app: avatarify

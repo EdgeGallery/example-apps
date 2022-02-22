@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: librespeed
+  namespace: default
+  labels:
+    app: librespeed
+spec:
+  selector:
+    matchLabels:
+      app: librespeed
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: librespeed
+    spec:
+      containers:
+        - name: librespeed
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/speedtestphp:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8989
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: librespeed-svc
+  namespace: default
+  labels:
+    svc: librespeed-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8989
+      name: function1
+      targetPort: 8989
+      protocol: TCP
+      nodePort: 32765
+  selector:
+    app: librespeed
+

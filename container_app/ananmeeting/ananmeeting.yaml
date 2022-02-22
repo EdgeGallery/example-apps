@@ -1,0 +1,167 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anan-ameeting
+  namespace: default
+  labels:
+    app: anan-ameeting
+spec:
+  selector:
+    matchLabels:
+      app: anan-ameeting
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: anan-ameeting
+    spec:
+      containers:
+        - name: ameeting
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/anan:ameeting-v2.0'
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 32073
+            - containerPort: 32074
+            - containerPort: 32100
+            - containerPort: 32101
+            - containerPort: 32102
+            - containerPort: 32103
+            - containerPort: 32104
+            - containerPort: 32105
+            - containerPort: 32106
+            - containerPort: 32107
+            - containerPort: 32108
+            - containerPort: 32109
+            - containerPort: 32110
+            - containerPort: 32111
+            - containerPort: 32112
+            - containerPort: 32113
+            - containerPort: 32114
+            - containerPort: 32115
+            - containerPort: 32116
+            - containerPort: 32117
+            - containerPort: 32118
+            - containerPort: 32119
+            - containerPort: 32120
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anan-ameeting-svc
+  namespace: default
+  labels:
+    svc: anan-ameeting
+spec:
+  type: NodePort
+  ports:
+    - port: 32073
+      name: ameetingtcp
+      targetPort: 32073
+      protocol: TCP
+      nodePort: 32073
+    - port: 32074
+      name: ammetingtcp2
+      targetPort: 32074
+      nodePort: 32074
+      protocol: TCP
+    - port: 32100
+      name: ameetingudp1
+      targetPort: 32100
+      protocol: UDP
+      nodePort: 32100
+    - port: 32101
+      name: ameetingudp2
+      targetPort: 32101
+      protocol: UDP
+      nodePort: 32101
+    - port: 32102
+      name: ameetingudp3
+      targetPort: 32102
+      protocol: UDP
+      nodePort: 32102
+    - port: 32103
+      name: ameetingudp4
+      targetPort: 32103
+      protocol: UDP
+      nodePort: 32103
+    - port: 32104
+      name: ameetingudp5
+      targetPort: 32104
+      protocol: UDP
+      nodePort: 32104
+    - port: 32105
+      name: ameetingudp6
+      targetPort: 32105
+      protocol: UDP
+      nodePort: 32105
+    - port: 32106
+      name: ameetingudp7
+      targetPort: 32106
+      protocol: UDP
+      nodePort: 32106
+    - port: 32107
+      name: ameetingudp8
+      targetPort: 32107
+      protocol: UDP
+      nodePort: 32107
+    - port: 32108
+      name: ameetingudp9
+      targetPort: 32108
+      protocol: UDP
+      nodePort: 32108
+    - port: 32109
+      name: ameetingudp10
+      targetPort: 32109
+      protocol: UDP
+      nodePort: 32109
+    - port: 32110
+      name: ameetingudp11
+      targetPort: 32110
+      protocol: UDP
+      nodePort: 32110
+    - port: 32111
+      name: ameetingudp12
+      targetPort: 32111
+      protocol: UDP
+      nodePort: 32111
+    - port: 32112
+      name: ameetingudp13
+      targetPort: 32112
+      protocol: UDP
+      nodePort: 32112
+    - port: 32113
+      name: ameetingudp14
+      targetPort: 32113
+      protocol: UDP
+      nodePort: 32113
+    - port: 32114
+      name: ameetingudp15
+      targetPort: 32114
+      protocol: UDP
+      nodePort: 32114
+    - port: 32115
+      name: ameetingudp16
+      targetPort: 32115
+      protocol: UDP
+      nodePort: 32115
+    - port: 32116
+      name: ameetingudp17
+      targetPort: 32116
+      protocol: UDP
+      nodePort: 32116
+    - port: 32117
+      name: ameetingudp18
+      targetPort: 32117
+      protocol: UDP
+      nodePort: 32117
+    - port: 32118
+      name: ameetingudp19
+      targetPort: 32118
+      protocol: UDP
+      nodePort: 32118
+  selector:
+    app: anan-ameeting
+
+

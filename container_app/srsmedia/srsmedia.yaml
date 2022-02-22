@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: srs
+  namespace: default
+  labels:
+    app: srs
+spec:
+  selector:
+    matchLabels:
+      app: srs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: srs
+    spec:
+      containers:
+        - name: srs
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/srs:2'
+          ports:
+            - containerPort: 8080
+            - containerPort: 1935
+            - containerPort: 1985
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: srs-svc
+  namespace: default
+  labels:
+    svc: srs-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32605
+      name: msgserver
+    - port: 1935
+      targetPort: 1935
+      protocol: TCP
+      nodePort: 32606
+      name: msgserver1
+    - port: 1985
+      targetPort: 1985
+      protocol: TCP
+      nodePort: 32607
+      name: msgserver2
+  selector:
+    app: srs

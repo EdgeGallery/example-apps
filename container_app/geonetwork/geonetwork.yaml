@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geonetwork
+  namespace: default
+  labels:
+    app: geonetwork
+spec:
+  selector:
+    matchLabels:
+      app: geonetwork
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: geonetwork
+    spec:
+      containers:
+        - name: geonetwork
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/geonetwork:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geonetwork-svc
+  namespace: default
+  labels:
+    svc: geonetwork-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      name: function1
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32699
+  selector:
+    app: geonetwork
