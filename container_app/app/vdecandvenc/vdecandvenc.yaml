@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdecandvenc
+  namespace: default
+  labels:
+    app: vdecandvenc
+spec:
+  selector:
+    matchLabels:
+      app: vdecandvenc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vdecandvenc
+    spec:
+      containers:
+        - name: vdecandvenc
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/ascend-infer-vdecandvenc-video:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vdecandvenc-svc
+  namespace: default
+  labels:
+    svc: vdecandvenc-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31551
+  selector:
+    app: vdecandvenc
+

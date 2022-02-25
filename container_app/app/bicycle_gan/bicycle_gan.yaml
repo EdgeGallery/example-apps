@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bicyclegan
+  namespace: default
+  labels:
+    app: bicyclegan
+spec:
+  selector:
+    matchLabels:
+      app: bicyclegan
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bicyclegan
+    spec:
+      containers:
+        - name: bicyclegan
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/bicyclegan:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bicyclegan-svc
+  namespace: default
+  labels:
+    svc: bicyclegan-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31664
+  selector:
+    app: bicyclegan
+

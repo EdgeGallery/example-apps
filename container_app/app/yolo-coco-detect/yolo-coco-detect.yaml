@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yolo-coco-detect
+  namespace: default
+  labels:
+    app: yolo-coco-detect
+spec:
+  selector:
+    matchLabels:
+      app: yolo-coco-detect
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: yolo-coco-detect
+    spec:
+      containers:
+        - name: yolo-coco-detect
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/ascend-infer-yolo-coco-detect-video:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yolo-coco-detect-svc
+  namespace: default
+  labels:
+    svc: yolo-coco-detect-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31552
+  selector:
+    app: yolo-coco-detect
+

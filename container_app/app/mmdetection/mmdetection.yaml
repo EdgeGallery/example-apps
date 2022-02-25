@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mmdetection
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: mmdetection
+spec:
+  selector:
+    matchLabels:
+      app: mmdetection
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mmdetection
+    spec:
+      containers:
+        - name: mmdetection
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mmdetection:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mmdetection-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: mmdetection-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31671
+  selector:
+    app: mmdetection
+

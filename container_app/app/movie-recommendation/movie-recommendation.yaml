@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation
+  namespace: default
+  labels:
+    app: recommendation
+spec:
+  selector:
+    matchLabels:
+      app: recommendation
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recommendation
+    spec:
+      containers:
+        - name: elasticsearch
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/elasticsearch:7.12.1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+        - name: spark-recommender
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/spark-recommender:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendation-svc
+  namespace: default
+  labels:
+    svc: recommendation-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31661
+  selector:
+    app: recommendation
+

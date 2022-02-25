@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safetygeardetector
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: safetygeardetector
+spec:
+  selector:
+    matchLabels:
+      app: safetygeardetector
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: safetygeardetector
+    spec:
+      containers:
+        - name: safetygeardetector
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/safetygeardetector:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: safetygeardetector-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: safetygeardetector-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31666
+  selector:
+    app: safetygeardetector
+

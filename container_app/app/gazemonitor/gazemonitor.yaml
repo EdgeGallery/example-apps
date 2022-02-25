@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gazemonitor
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: gazemonitor
+spec:
+  selector:
+    matchLabels:
+      app: gazemonitor
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gazemonitor
+    spec:
+      containers:
+        - name: gazemonitor
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/gazemonitor:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gazemonitor-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: gazemonitor-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31665
+  selector:
+    app: gazemonitor
+

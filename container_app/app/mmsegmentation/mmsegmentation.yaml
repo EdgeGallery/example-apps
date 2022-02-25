@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mmsegmentation
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: mmsegmentation
+spec:
+  selector:
+    matchLabels:
+      app: mmsegmentation
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mmsegmentation
+    spec:
+      containers:
+        - name: mmsegmentation
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mmsegmentation:v1'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mmsegmentation-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: mmsegmentation-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31674
+  selector:
+    app: mmsegmentation
+

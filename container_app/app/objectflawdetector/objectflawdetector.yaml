@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: objectflawdetector
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: objectflawdetector
+spec:
+  selector:
+    matchLabels:
+      app: objectflawdetector
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: objectflawdetector
+    spec:
+      containers:
+        - name: objectflawdetector
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/objectflawdetection:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: objectflawdetector-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: objectflawdetector-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31670
+  selector:
+    app: objectflawdetector
+
