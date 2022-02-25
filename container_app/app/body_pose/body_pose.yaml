@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: body-pose
+  namespace: default
+  labels:
+    app: body-pose
+spec:
+  selector:
+    matchLabels:
+      app: body-pose
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: body-pose
+    spec:
+      containers:
+        - name: body-pose
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/ascend-infer-images:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: ASCEND_VISIBLE_DEVICES
+              value: "0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: body-pose-svc
+  namespace: default
+  labels:
+    svc: body-pose-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31559
+  selector:
+    app: body-pose
+

@@ -1,0 +1,147 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-be-service-32115
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: monitoring-be-service-32115
+spec:
+  type: NodePort
+  ports:
+    - port: 9997
+      targetPort: 9997
+      nodePort: 32115
+      name: http
+  selector:
+    app: monitoring-be-32115
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitoring-be-32115
+  labels: 
+    app: monitoring-be-32115
+spec:
+  containers:
+  - name: monitoring-be-service-32115-deployment
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/monitoring-be-service:v2.0'
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 9997
+    env:
+      - name: LISTEN_IP
+        value: 0.0.0.0
+      - name: FE_SERVICE
+        value: "monitoring-proxy-service-32117:5000"
+      - name: MEP_AGENT
+        value: 127.0.0.1:8080
+      - name: API_GATEWAY
+        value: 'face-recognition.default:9999'
+   # {{- if .Values.global.mepagent.enabled }}
+  - name: mep-agent
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mep-agent:v1.5.1'
+    imagePullPolicy: IfNotPresent
+    env:
+      - name: ENABLE_WAIT
+        value: "true"
+      - name: MEP_IP
+        value: "mep-api-gw.mep"
+      - name: MEP_APIGW_PORT
+        value: "8443"
+      - name: CA_CERT_DOMAIN_NAME
+        value: "edgegallery"
+      - name: CA_CERT
+        value: /usr/mep/ssl/ca.crt
+      - name: AK
+        valueFrom:
+          secretKeyRef:
+            name: '{{ .Values.appconfig.aksk.secretname }}'
+            key: accesskey
+      - name: SK
+        valueFrom:
+          secretKeyRef:
+            name: '{{ .Values.appconfig.aksk.secretname }}'
+            key: secretkey
+      - name: APPINSTID
+        valueFrom:
+          secretKeyRef:
+            name: '{{ .Values.appconfig.aksk.secretname }}'
+            key: appInsId
+    volumeMounts:
+      - name: mep-agent-service-config-volume
+        mountPath: /usr/mep/conf/app_instance_info.yaml
+        subPath: app_instance_info.yaml
+              
+  volumes:
+    - name: mep-agent-service-config-volume
+      configMap:
+        name: '{{ .Values.global.mepagent.configmapname }}'   
+  # {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-fe-service-32116
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: monitoring-fe-service-32116
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 32116
+    name: http
+
+  selector:
+    app: monitoring-fe-32116
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitoring-fe-32116
+  labels: 
+    app: monitoring-fe-32116
+spec:
+  containers:
+  - name: monitoring-fe-service-32116-deployment
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/monitoring-fe-service:latest'
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-proxy-service-32117
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: monitoring-proxy-service-32117
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 32117
+    name: http
+  selector:
+    app: monitoring-proxy-32117
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monitoring-proxy-32117
+  labels: 
+    app: monitoring-proxy-32117
+spec:
+  containers:
+  - name: monitoring-proxy-service-32117-deployment
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/monitoring-proxy-service:v2.0'
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 5000
+    env:
+      - name: EXPOSE_PORT
+        value: "32117"

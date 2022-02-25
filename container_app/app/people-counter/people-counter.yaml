@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peoplecounter
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    app: peoplecounter
+spec:
+  selector:
+    matchLabels:
+      app: peoplecounter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: peoplecounter
+    spec:
+      containers:
+        - name: peoplecounter
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/people-counter:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: peoplecounter-svc
+  namespace: '{{ .Values.appconfig.appnamespace }}'
+  labels:
+    svc: peoplecounter-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31668
+  selector:
+    app: peoplecounter
+

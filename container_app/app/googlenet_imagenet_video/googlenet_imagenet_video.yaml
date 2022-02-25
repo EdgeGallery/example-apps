@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: googlenet
+  namespace: default
+  labels:
+    app: googlenet
+spec:
+  selector:
+    matchLabels:
+      app: googlenet
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: googlenet
+    spec:
+      containers:
+        - name: googlenet
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/ascend-infer-googlenet:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: googlenet-svc
+  namespace: default
+  labels:
+    svc: googlenet-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31550
+  selector:
+    app: googlenet
+

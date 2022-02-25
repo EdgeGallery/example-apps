@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: colorization-video
+  namespace: default
+  labels:
+    app: colorization-video
+spec:
+  selector:
+    matchLabels:
+      app: colorization-video
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: colorization-video
+    spec:
+      containers:
+        - name: colorization-video
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/ascend-infer-colorization:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: colorization-video-svc
+  namespace: default
+  labels:
+    svc: colorization-video-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31554
+  selector:
+    app: colorization-video
+

@@ -1,0 +1,107 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: location-be-service-32079
+  labels:
+    app: location-be-service-32079
+spec:
+  type: NodePort
+  ports:
+    - port: 8079
+      targetPort: 8079
+      nodePort: 32079
+      name: http
+  selector:
+    app: location-be-32079
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: location-be-32079
+  labels: 
+    app: location-be-32079
+spec:
+  containers:
+  - name: location-be-service-32079-deployment
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/location-be-service:latest'
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 8079
+    env:
+      - name: LISTEN_IP
+        value: 0.0.0.0
+      - name: MEP_AGENT
+        value: 127.0.0.1:8080
+   {{- if .Values.global.mepagent.enabled }}
+  - name: mep-agent
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/mep-agent:v1.5.1'
+    imagePullPolicy: IfNotPresent
+    env:
+      - name: ENABLE_WAIT
+        value: "true"
+      - name: MEP_IP
+        value: "mep-api-gw.mep"
+      - name: MEP_APIGW_PORT
+        value: "8443"
+      - name: CA_CERT_DOMAIN_NAME
+        value: "edgegallery"
+      - name: CA_CERT
+        value: /usr/mep/ssl/ca.crt
+      - name: AK
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.appconfig.aksk.secretname }}
+            key: accesskey
+      - name: SK
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.appconfig.aksk.secretname }}
+            key: secretkey
+      - name: APPINSTID
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.appconfig.aksk.secretname }}
+            key: appInsId
+    volumeMounts:
+      - name: mep-agent-service-config-volume
+        mountPath: /usr/mep/conf/app_instance_info.yaml
+        subPath: app_instance_info.yaml
+              
+  volumes:
+    - name: mep-agent-service-config-volume
+      configMap:
+        name: {{ .Values.global.mepagent.configmapname }}   
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: location-fe-service-32080
+  labels:
+    app: location-fe-service-32080
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 32080
+    name: http
+
+  selector:
+    app: location-fe-32080
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: location-fe-32080
+  labels: 
+    app: location-fe-32080
+spec:
+  containers:
+  - name: location-fe-service-32080-deployment
+    image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/location-fe-service:latest'
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 8080

@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: human-segment
+  namespace: default
+  labels:
+    app: human-segment
+spec:
+  selector:
+    matchLabels:
+      app: human-segment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: human-segment
+    spec:
+      containers:
+        - name: googlenet
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/ascend-infer-human-segment:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: human-segment-svc
+  namespace: default
+  labels:
+    svc: human-segment-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 31553
+  selector:
+    app: human-segment
+

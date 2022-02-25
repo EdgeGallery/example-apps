@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solitaire
+  namespace: default
+  labels:
+    app: solitaire
+spec:
+  selector:
+    matchLabels:
+      app: solitaire
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: solitaire
+    spec:
+      containers:
+        - name: solitaire
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/solitaire:nginx'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+#docker pull kevintvan/solitaire:nginx
+apiVersion: v1
+kind: Service
+metadata:
+  name: solitaire-svc
+  namespace: default
+  labels:
+    svc: solitaire-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32588
+  selector:
+    app: solitaire
+

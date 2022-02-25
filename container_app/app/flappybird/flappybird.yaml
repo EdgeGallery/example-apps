@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flappybird
+  namespace: default
+  labels:
+    app: flappybird
+spec:
+  selector:
+    matchLabels:
+      app: flappybird
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flappybird
+    spec:
+      containers:
+        - name: flappybird
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/flappybird:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flappybird-svc
+  namespace: default
+  labels:
+    svc: flappybird-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32584
+  selector:
+    app: flappybird
+

@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wolfenstein3d
+  namespace: default
+  labels:
+    app: wolfenstein3d
+spec:
+  selector:
+    matchLabels:
+      app: wolfenstein3d
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wolfenstein3d
+    spec:
+      containers:
+        - name: wolfenstein3d
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/wolfenstein3d:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wolfenstein3d-svc
+  namespace: default
+  labels:
+    svc: wolfenstein3d-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: function1
+      targetPort: 80
+      protocol: TCP
+      nodePort: 32584
+  selector:
+    app: wolfenstein3d
+
