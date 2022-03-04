@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: geonetwork
-          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/geonetwork:latest'
+          image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/geonetwork:3.10'
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

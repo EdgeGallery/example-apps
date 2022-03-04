@@ -2,45 +2,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: domoticz
+  name: my-domoticz
   namespace: default
   labels:
-    app: domoticz
+    app: my-domoticz
 spec:
   selector:
     matchLabels:
-      app: domoticz
+      app: my-domoticz
   replicas: 1
   template:
     metadata:
       labels:
-        app: domoticz
+        app: my-domoticz
     spec:
       containers:
-        - name: domoticz
+        - name: my-domoticz
           image: '{{.Values.imagelocation.domainname}}/{{.Values.imagelocation.project}}/domoticz:latest'
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 8080 
             - containerPort: 6144
-            - containerPort: 1443
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: TZ
-              value: "Europe/London"
-            - name: WEBROOT
-              value: "domoticz"
----
+            - containerPort: 1443             
+---            
 apiVersion: v1
 kind: Service
 metadata:
-  name: domoticz-svc
+  name: my-domoticz-svc
   namespace: default
   labels:
-    svc: domoticz-svc
+    svc: my-domoticz-svc
 spec:
   type: NodePort
   ports:
@@ -58,7 +49,7 @@ spec:
       name: domoticz2
       targetPort: 1443
       protocol: TCP
-      nodePort: 32617
+      nodePort: 32617  
   selector:
-    app: domoticz
+    app: my-domoticz
 
