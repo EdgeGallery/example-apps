@@ -21,9 +21,6 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
-          env:
-            - name: NUXEO_PACKAGES
-              value: "nuxeo-web-ui nuxeo-jsf-ui"
 ---
 apiVersion: v1
 kind: Service
